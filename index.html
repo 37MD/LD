@@ -18461,7 +18461,15 @@ function LDScanner() {
     value: "FAKE SUPPORT"
   }, "\uD83D\uDD34 Fake"), /*#__PURE__*/React.createElement("option", {
     value: "ABORT"
-  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement("button", {
+  }, "\uD83D\uDC80 Abort")), !scanning ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: "#888",
+      fontFamily: "'Space Mono','Courier New',monospace",
+      whiteSpace: "nowrap",
+      marginRight: 4
+    }
+  }, Object.values(results).filter(v => v && !v.error && v.wRsi != null).length + "/" + ALL_INDICES.filter(i => i.symbol).length + " OK"), /*#__PURE__*/React.createElement("button", {
     style: {
       background: accent,
       border: "none",
@@ -18624,8 +18632,8 @@ function LDScanner() {
   }, "%Wt-A", si("baPct")))), /*#__PURE__*/React.createElement("tbody", null, rows.map((r, i) => {
     if (!r.wRsi && !r.error) return null;
     if (r.error) return /*#__PURE__*/React.createElement("tr", { key: r.symbol, style: { background: "#fff8f8" } },
-      /*#__PURE__*/React.createElement("td", { style: { ...td1S, color: red, fontSize: 10 } }, r.name),
-      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#c8102e", fontSize: 10, fontStyle: "italic" } }, "⚠ CORS blocked — use Regime Change scanner (works with CORS) or open via local HTTP server")
+      /*#__PURE__*/React.createElement("td", { style: { ...td1S, color: "#999", fontSize: 10 } }, r.name),
+      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#999", fontSize: 10, fontStyle: "italic" } }, "No data")
     );
     const et = runET(r, vix);
     const ba = baRes[r.symbol];
