@@ -17845,7 +17845,13 @@ async function fetchIdx(symbol) {
     // Fallback to stooq.com if Yahoo CORS blocked (stooq supports CORS on mobile)
     if (!wC.length && !dC.length) {
       try {
-        const stooqSym = symbol.replace(/\.(NS|BO)$/,'').replace('^','').toLowerCase();
+        // Convert Yahoo symbol to stooq format
+        let stooqSym = symbol
+          .replace(/\.NS$/i, '.nse')   // NSE stocks: .NS → .nse
+          .replace(/\.BO$/i, '.bo')    // BSE stocks: .BO → .bo
+          .toLowerCase();
+        // Lipper/Refinitiv codes (0P000...) won't work on stooq
+        if (stooqSym.match(/^0p/i)) throw new Error('Lipper code');
         const stooqUrl = `https://stooq.com/q/d/l/?s=${stooqSym}&i=d`;
         const stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(6000) });
         if (stooqRes.ok) {
@@ -18129,10 +18135,11 @@ function LDScanner() {
         done++;
       });
       setResults({ ...tmp });
+      const okCount = Object.values(tmp).filter(v => v && !v.error && v.wRsi != null).length;
       setProgress({
         done,
         total: toFetch.length,
-        label: done + "/" + toFetch.length + " scanned"
+        label: done + "/" + toFetch.length + " scanned (" + okCount + " OK)"
       });
     }
     // Save to localStorage
