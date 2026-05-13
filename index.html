@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <title>Lie Detector — NPS NAV Chart · LD252A</title>
+        <title>Lie Detector — NPS NAV Chart · LD252A2</title>
         <link rel="manifest" href="manifest.json">
         <meta name="theme-color" content="#0d0d0d">
         <meta name="mobile-web-app-capable" content="yes">
@@ -2146,7 +2146,7 @@
         <div id="sopModal">
             <div class="sop-header">
                 <div class="sop-header-left">
-                    <span class="sop-logo">Sacred RSI Regime System · LD252A</span>
+                    <span class="sop-logo">Sacred RSI Regime System · LD252A2</span>
                     <span class="sop-title">Lie Detector SOP</span>
                     <span class="sop-subtitle">Standard Operating Procedure — Buy · Sell · Monitor · Review</span>
                 </div>
@@ -2574,7 +2574,7 @@
                     Let the STCG clock run.&nbsp; Everything else is noise."
                 </div>
                 <div class="sop-note" style="text-align:center;margin-top:8px;">
-                    Sacred RSI Regime System · LD252A &nbsp;|&nbsp; Data: mfapi.in / npsnav.in &nbsp;|&nbsp;
+                    Sacred RSI Regime System · LD252A2 &nbsp;|&nbsp; Data: mfapi.in / npsnav.in &nbsp;|&nbsp;
                     STCG: 20% on gains held &lt; 365 days &nbsp;|&nbsp; For simulation and discipline training only.
                 </div>
             </div>
@@ -2586,11 +2586,11 @@
         <div id="setupScreen">
             <div class="setup-logo">Sacred RSI Regime System</div>
             <div class="streak-badge" id="streakBadge"></div>
-            <h1 class="setup-title">Lie Detector <span onclick="openSOP()" class="version-badge-link" title="Open SOP / Operating Procedure" style="color:var(--muted);font-size:0.45em;font-weight:400;cursor:pointer;">LD252A 📋</span></h1>
+            <h1 class="setup-title">Lie Detector <span onclick="openSOP()" class="version-badge-link" title="Open SOP / Operating Procedure" style="color:var(--muted);font-size:0.45em;font-weight:400;cursor:pointer;">LD252A2 📋</span></h1>
             <p class="setup-sub">Train your discipline before real money does.</p>
             <div id="firstRunBanner" style="display:none;background:rgba(245,158,11,0.12);border:1.5px solid #f59e0b;border-radius:6px;padding:8px 10px;margin-bottom:8px;text-align:center;">
                 <div class="firstRunTitle" style="font-size:0.58rem;font-weight:700;color:#c97a00;margin-bottom:3px;">⚠ Storage cleared — open your backup HTML to restore</div>
-                <div class="firstRunMsg" style="font-size:0.5rem;color:var(--muted);">Android Chrome clears storage after hours in background. Open your saved <b>LD252A_date.html</b> backup — config auto-loads.</div>
+                <div class="firstRunMsg" style="font-size:0.5rem;color:var(--muted);">Android Chrome clears storage after hours in background. Open your saved <b>LD252A2_date.html</b> backup — config auto-loads.</div>
             </div>
             <div id="morningScanBanner" style="display:none;margin:2px 12px 6px;padding:6px 10px;border-radius:8px;font-size:0.52rem;font-family:var(--mono);letter-spacing:0.04em;border:1px solid var(--border);background:var(--surface2);color:var(--muted);text-align:center;line-height:1.6;"></div>
             <div style="display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;margin-bottom:10px;padding:0 2px;">
@@ -2874,7 +2874,7 @@
                     </label>
                 </div>
             </div>
-            <!-- LD252A: Full config backup/restore panel -->
+            <!-- LD252A2: Full config backup/restore panel -->
             <div style="padding:6px 8px 4px;border-top:2px solid #f59e0b;flex-shrink:0;background:rgba(245,158,11,0.06);">
                 <div style="font-size:0.52rem;color:#c97a00;margin-bottom:4px;text-align:center;letter-spacing:0.06em;font-weight:700;">💾 FULL CONFIG BACKUP — Keys · Watchlist · Settings</div>
                 <div style="font-size:0.42rem;color:var(--muted);text-align:center;margin-bottom:5px;">Saves a new HTML with everything baked in. Open that file next time — auto-loads instantly.</div>
@@ -2886,6 +2886,10 @@
                     </label>
                 </div>
                 <div id="configBackupStatus" style="font-size:0.44rem;color:var(--muted);text-align:center;min-height:14px;"></div>
+            </div>
+            <div style="padding:6px 8px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:6px;">
+                <button class="setup-btn" style="border-color:var(--border2);color:var(--muted2);flex:1;font-size:0.55rem;min-height:44px;padding:8px 6px;" onclick="refreshWatchlist()">↺ REFRESH ALL</button>
+                <button class="setup-btn" style="border-color:var(--red);color:var(--red);flex:1;font-size:0.55rem;min-height:44px;padding:8px 6px;" onclick="clearWatchlist()">🗑 CLEAR</button>
             </div>
         </div>
         <div id="liveChartModal" class="modal-overlay">
@@ -3711,29 +3715,25 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                 </div>
             </div>
         </div>
-        <!-- LD252A: Self-restoring config store — base64 encoded, written by BACKUP, read on startup -->
-        <script type="application/json" id="LD252A_EMBED">null</script>
+        <!-- LD252A2: Self-restoring config store — base64 encoded, written by BACKUP, read on startup -->
+        <script type="application/json" id="LD252A2_EMBED">null</script>
         <script>
             'use strict';
             // Auto-restore from embed on startup (fires before main script)
             (function _autoRestoreFromEmbed() {
                 try {
-                    const embedEl = document.getElementById('LD252A_EMBED');
+                    const embedEl = document.getElementById('LD252A2_EMBED');
                     if (!embedEl) return;
                     const raw = (embedEl.textContent || embedEl.innerText || '').trim();
                     if (!raw || raw === 'null') return;
                     const hasKey = !!localStorage.getItem('ld_gemini_api_key');
                     const hasWl  = (JSON.parse(localStorage.getItem('ld_watchlist') || '[]')).length > 0;
-                    if (hasKey || hasWl) return;
-                    // Inline safe decode (functions not yet defined at this point)
-                    if (!raw || typeof raw !== 'string') return;
-                    const decoded = atob(raw.replace(/\s/g, ''));
-                    const obj = JSON.parse(decodeURIComponent(escape(decoded)));
-                    if (obj === null || typeof obj !== 'object' || Array.isArray(obj)) return;
-                    Object.entries(obj).forEach(([k, v]) => {
-                        try { if (k && !k.startsWith('_') && typeof v === 'string') localStorage.setItem(k, v); } catch(e) { console.warn('Embed restore failed for', k, e.message); }
+                    if (hasKey || hasWl) return; // localStorage intact — skip
+                    const config = JSON.parse(decodeURIComponent(escape(atob(raw))));
+                    Object.entries(config).forEach(([k, v]) => {
+                        try { if (k && !k.startsWith('_')) localStorage.setItem(k, v); } catch(_) {}
                     });
-                } catch(e) { console.warn('autoRestoreFromEmbed error:', e.message); }
+                } catch(e) { /* silent */ }
             })();
         </script>
         <script>
@@ -4078,9 +4078,6 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
             const BUY_DELTA_LEVEL    = -15;    
             const NIFTY50_PROXY_CODE  = '120716'; 
             const NIFTY50_CACHE_KEY   = 'ld_nifty50_proxy_nav_v3';
-            const API_MFAPI_BASE    = 'https://api.mfapi.in/mf';
-            const API_NPSNAV_BASE   = 'https://npsnav.in/api/historical';
-            const API_YAHOO_BASE    = 'https://query1.finance.yahoo.com/v8/finance/chart';
             function _s(str) {
                 if (!str) return '';
                 return String(str)
@@ -4089,22 +4086,6 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                     .replace(/>/g, '&gt;')
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#39;');
-            }
-            function _safeJSON(str) {
-                try {
-                    if (!str || typeof str !== 'string') return null;
-                    const obj = JSON.parse(str);
-                    if (obj !== null && typeof obj === 'object' && !Array.isArray(obj)) return obj;
-                    return null;
-                } catch(e) { console.warn('safeJSON parse error:', e.message); return null; }
-            }
-            function _safeB64decode(b64) {
-                try {
-                    if (!b64 || typeof b64 !== 'string') return null;
-                    const decoded = atob(b64.replace(/\s/g, ''));
-                    const json = _safeJSON(decodeURIComponent(escape(decoded)));
-                    return json;
-                } catch(e) { console.warn('safeB64decode error:', e.message); return null; }
             }
             const IDB_CACHE_TTL_MS   = 12 * 60 * 60 * 1000; 
             const MIN_DATA_BARS      = 80;     
@@ -4318,11 +4299,9 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                 return dStr;
             };
             window.resetSimZoom = function() {
-                const btn1Y = Array.from(document.querySelectorAll('#simTfRow .tf-btn')).find(b =>
-                    (b.getAttribute('onclick') || '').includes('250') || b.textContent.trim() === '1Y'
-                );
+                const btn1Y = document.querySelector('#simTfRow .tf-btn[onclick*="250"]')
+                           || document.querySelector('#simTfRow .tf-btn:nth-child(7)');
                 if (btn1Y && typeof updateSimLookback === 'function') {
-                    btn1Y.classList.add('active');
                     updateSimLookback(250, btn1Y);
                 } else {
                     window.currentSimLookback = 250;
@@ -4330,11 +4309,9 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                 }
             };
             window.resetLiveZoom = function() {
-                const btn1Y = Array.from(document.querySelectorAll('#liveChartTfRow .tf-btn')).find(b =>
-                    (b.getAttribute('onclick') || '').includes('250') || b.textContent.trim() === '1Y'
-                );
+                const btn1Y = document.querySelector('#liveChartTfRow .tf-btn[onclick*="250"]')
+                           || document.querySelector('#liveChartTfRow .tf-btn:nth-child(7)');
                 if (btn1Y && typeof updateLiveChartOnly === 'function') {
-                    btn1Y.classList.add('active');
                     updateLiveChartOnly(250, btn1Y);
                 }
             };
@@ -4637,7 +4614,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                         const j = raw ? JSON.parse(raw) : null;
                         if (j && j.switches) return j;
                     } catch(_) {}
-                    return { version: 'LD252A', switches: {}, lastUpdated: 0 };
+                    return { version: 'LD252A2', switches: {}, lastUpdated: 0 };
                 },
                 save(j) {
                     try {
@@ -4715,7 +4692,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
             };
             window._SJ = _SJ;
 
-            // ── LD252A: FULL CONFIG BACKUP / RESTORE ─────────────────────────────
+            // ── LD252A2: FULL CONFIG BACKUP / RESTORE ─────────────────────────────
             const CONFIG_KEYS = [
                 'ld_gemini_api_key', 'ld_gemini_api_key2', 'ld_gemini_model',
                 'ld_api_gap_sec', 'ld_active_key_slot',
@@ -4738,16 +4715,16 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                         const v = localStorage.getItem(prefix + _todayKey);
                         if (v !== null) blob[prefix + _todayKey] = v;
                     });
-                    blob['ld_last_version'] = 'LD252A';
+                    blob['ld_last_version'] = 'LD252A2';
                     const configB64 = btoa(unescape(encodeURIComponent(JSON.stringify(blob))));
                     const currentHtml = document.documentElement.outerHTML;
                     const newHtml = currentHtml.replace(
-                        /(<script[^>]*id="LD252A_EMBED"[^>]*>)[\s\S]*?(<\/script>)/,
+                        /(<script[^>]*id="LD252A2_EMBED"[^>]*>)[\s\S]*?(<\/script>)/,
                         (_, open, close) => open + configB64 + close
                     );
                     const wl = JSON.parse(blob['ld_watchlist'] || '[]');
                     const date = new Date(Date.now()+5.5*3600000).toISOString().slice(0,10);
-                    const fname = `LD252A_${date}_${wl.length}funds.html`;
+                    const fname = `LD252A2_${date}_${wl.length}funds.html`;
                     const a = document.createElement('a');
                     a.href = 'data:text/html;charset=utf-8,' + encodeURIComponent(newHtml);
                     a.download = fname;
@@ -4769,7 +4746,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                         let fileType = 'unknown';
                         if (raw.trim().startsWith('<!DOCTYPE') || raw.trim().startsWith('<html')) {
                             fileType = 'html';
-                            const match = raw.match(/<script[^>]*id="LD252A_EMBED"[^>]*>([\s\S]*?)<\/script>/) ||
+                            const match = raw.match(/<script[^>]*id="LD252A2_EMBED"[^>]*>([\s\S]*?)<\/script>/) ||
                                          raw.match(/<script[^>]*id="LD251_EMBED"[^>]*>([\s\S]*?)<\/script>/) ||
                                          raw.match(/<script[^>]*id="LD250_EMBED"[^>]*>([\s\S]*?)<\/script>/) ||
                                          raw.match(/<script[^>]*id="LD249A_EMBED"[^>]*>([\s\S]*?)<\/script>/) ||
@@ -4777,8 +4754,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                             if (!match || !match[1] || match[1].trim() === 'null') {
                                 throw new Error('HTML file has no embedded config — use a backup HTML, not the base app');
                             }
-                            blob = _safeB64decode(match[1].trim());
-                            if (!blob) throw new Error('Invalid embedded config — corrupt or tampered');
+                            blob = JSON.parse(decodeURIComponent(escape(atob(match[1].trim()))));
                         } else {
                             const parsed = JSON.parse(raw);
                             if (parsed.switches && typeof parsed.switches === 'object' &&
@@ -4807,7 +4783,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                         ['bgbreadth_ran_','ld_alert_ran_'].forEach(prefix => {
                             if (blob[prefix + _todayKey] !== undefined) localStorage.setItem(prefix + _todayKey, blob[prefix + _todayKey]);
                         });
-                        localStorage.setItem('ld_last_version', 'LD252A');
+                        localStorage.setItem('ld_last_version', 'LD252A2');
                         try { _watchlist = JSON.parse(localStorage.getItem('ld_watchlist') || '[]'); } catch(_) {}
                         const wl = _watchlist.length;
                         const hasKey = !!localStorage.getItem('ld_gemini_api_key');
@@ -4826,7 +4802,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
             window._configBackupImport = _configBackupImport;
             // First-run check: show banner if storage cleared
             (function _checkFirstRun() {
-                localStorage.setItem('ld_last_version', 'LD252A');
+                localStorage.setItem('ld_last_version', 'LD252A2');
                 const hasKey = !!localStorage.getItem('ld_gemini_api_key');
                 const hasWl  = (JSON.parse(localStorage.getItem('ld_watchlist')||'[]')).length > 0;
                 if (!hasKey && !hasWl) {
@@ -5238,8 +5214,7 @@ text-align:center;display:flex;flex-direction:column;justify-content:center;">
                 if (arr.length <= period) return 0;
                 let trSum = 0;
                 for (let i = arr.length - period; i < arr.length; i++) {
-                    const prev = (i > 0) ? arr[i - 1] : arr[i];
-                    trSum += Math.abs(arr[i] - prev);
+                    trSum += Math.abs(arr[i] - arr[i - 1]);
                 }
                 return trSum / period;
             }
@@ -7167,10 +7142,8 @@ ${Math.abs(diff) < 0.05 ? 'Tied' : (aWins ? nameA : nameB) + ' outperforms by ' 
                             el.disabled = true;
                         }
                     });
-                    } catch (e) {
-                        const _ovTxt2 = document.getElementById('ovTxt');
-                        if (_ovTxt2) { _ovTxt2.textContent = `⚠ ${fund.name.slice(0,20)}: ${e.message.slice(0,40)}`; }
-                    }
+                } catch (e) {
+                     }
             }
             function runStressTest() {
                 const scenario = document.getElementById('stressSelect').value;
@@ -8744,12 +8717,6 @@ This is exactly how the system is meant to be played.
                 }).join('');
             }
             function showCustomRationale() {
-                const bar = document.getElementById('rationaleBar');
-                const chips = document.getElementById('rationaleChips');
-                const customRow = document.getElementById('rationaleCustomRow');
-                if (bar) bar.style.display = 'flex';
-                if (chips) chips.style.display = 'none';
-                if (customRow) customRow.style.display = 'flex';
             }
             function hideRationaleBar() {
                 const bar = document.getElementById('rationaleBar');
@@ -10041,8 +10008,7 @@ function buildWeeklyRsiFast(allPrices, period = 4, allDates = null) {
                 let completed = 0;
                 const processFund = async (fund) => {
                     try {
-                        const _cb2 = `t=${Date.now()}`;
-                        const url = (fund.code.startsWith('SM') ? `https://npsnav.in/api/historical/${fund.code}` : `https://api.mfapi.in/mf/${fund.code}`) + `?${_cb2}`;
+                        const url = fund.code.startsWith('SM') ? `https://npsnav.in/api/historical/${fund.code}` : `https://api.mfapi.in/mf/${fund.code}`;
                         const res = await fetch(url);
                         const data = await res.json();
                         if (!data?.data) return;
@@ -10235,8 +10201,7 @@ border-radius:var(--radius);padding:8px 10px;cursor:pointer;margin-bottom:6px;`;
                 let completed = 0;
                 const processFund = async (fund) => {
                     try {
-                        const _cb = `t=${Date.now()}`;
-                        const url = (fund.code.startsWith('SM') ? `https://npsnav.in/api/historical/${fund.code}` : `https://api.mfapi.in/mf/${fund.code}`) + `?${_cb}`;
+                        const url = fund.code.startsWith('SM') ? `https://npsnav.in/api/historical/${fund.code}` : `https://api.mfapi.in/mf/${fund.code}`;
                         const res = await fetch(url);
                         const data = await res.json();
                         if (!data?.data) return;
@@ -12061,6 +12026,10 @@ WMA20: ₹${d.wma20 ? d.wma20.toFixed(2) : '--'}
                 <div style="display:flex;flex-direction:column;text-align:left;gap:2px;">
                     <span class="modal-title" style="color:var(--red);font-weight:400;">ALERTS SUMMARY</span>
                     <span id="alertSummarySub" style="font-size:0.55rem;font-weight:400;color:var(--muted);margin-top:1px;">Scanning Universe...</span>
+                    <span id="alertSummaryCAMS" style="font-size:0.48rem;color:var(--muted2);font-family:var(--mono);">
+                        🔍 Validate NAV: <a href="https://www.camsonline.com/Investors/Statements/Consolidated-Account-Statement" target="_blank" style="color:var(--accent);text-decoration:none;">CAMS CAS</a>
+                        &nbsp;·&nbsp; Source: mfapi.in / npsnav.in
+                    </span>
                 </div>
                 <span class="modal-close-btn" onclick="document.getElementById('alertSummaryModal').style.display='none'; document.getElementById('setupScreen').style.display='flex';">[ CLOSE ]</span>
             </div>
@@ -13867,11 +13836,12 @@ categories.forEach(cat => {
         
         
         const GEMINI_CASCADE = [
-            geminiModel,                        // user-selected
+            geminiModel,                        // user-selected (default: 3.1-flash-lite)
             'gemini-3.1-flash-lite',            // tier 1 fallback
             'gemini-3-flash',                   // tier 2
             'gemini-3.1-pro',                   // tier 3
-            'gemini-2.5-flash-lite',            // tier 4
+            'gemini-2.5-flash-lite',            // tier 4 legacy fallback
+            'gemini-2.5-flash',                 // tier 5 legacy fallback
         ];
 
         async function callGemini(prompt, useSearch = false) {
@@ -14577,7 +14547,6 @@ Return a JSON object with this exact structure:
                     <option value="gemini-3.1-flash-lite">3.1 Flash-Lite ⚡ (default)</option>
                     <option value="gemini-3-flash">3.0 Flash 🚀</option>
                     <option value="gemini-3.1-pro">3.1 Pro 🔬</option>
-                    <option value="gemini-2.5-flash-lite">2.5 Flash-Lite ⚡</option>
                     <option value="gemini-2.5-flash-lite">2.5 Flash-Lite (fallback)</option>
                     <option value="gemini-2.5-flash">2.5 Flash (fallback)</option>
                 </select>
@@ -14651,12 +14620,6 @@ Return a JSON object with this exact structure:
             <!-- Status + close row -->
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                 <div id="ld-ai-key-status" style="font-size:0.48rem;color:#404060;flex:1;line-height:1.5;"></div>
-                <button id="ld-key-debug-btn" onclick="window._ldToggleDebug()"
-                    style="background:#1a1a2e;color:#00e8a2;border:1px solid #00e8a2;
-                           border-radius:5px;padding:4px 10px;font-size:0.5rem;cursor:pointer;
-                           font-family:var(--mono);font-weight:600;white-space:nowrap;flex-shrink:0;">
-                    🔬 Debug
-                </button>
                 <button id="ld-ai-key-cancel-btn"
                     style="background:#f2f5f9;color:#404060;border:1.5px solid #b0bece;
                            border-radius:5px;padding:4px 12px;font-size:0.5rem;cursor:pointer;
@@ -14692,12 +14655,12 @@ Return a JSON object with this exact structure:
         const input = document.getElementById('ld-ai-input');
         const submit = document.getElementById('ld-ai-submit');
         
-        const GEMINI_MODEL_DEFAULT = 'gemini-2.5-flash';
+        const GEMINI_MODEL_DEFAULT = 'gemini-3.1-flash-lite';
 
         const modelSelect = document.getElementById('ld-gemini-model-select');
         let savedModel = localStorage.getItem('ld_gemini_model') || GEMINI_MODEL_DEFAULT;
         // Migrate old 2.5 default → new 3.1 default
-        const _validModels = ['gemini-2.5-flash','gemini-2.5-flash-lite','gemini-2.0-flash','gemini-2.0-flash-lite'];
+        const _validModels = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite','gemini-2.5-flash'];
         if (!_validModels.includes(savedModel)) { savedModel = GEMINI_MODEL_DEFAULT; try { localStorage.setItem('ld_gemini_model', savedModel); } catch(_){} }
         if (modelSelect) {
             modelSelect.value = savedModel;
@@ -15041,7 +15004,7 @@ Return a JSON object with this exact structure:
             return { fundName, fundCode };
         }
         function gatherLeanContext() {
-            let ctx = "=== LD252A LEAN TARGET FUND DUMP ===\n";
+            let ctx = "=== LD252A2 LEAN TARGET FUND DUMP ===\n";
             ctx += `Timestamp: ${new Date().toISOString()}\n`;
             const { fundName, fundCode } = getFundInfo();
             const regime = document.getElementById('liveRegimeBlock')?.textContent || document.getElementById('regimeBlock')?.textContent || 'N/A';
@@ -15166,7 +15129,7 @@ Return a JSON object with this exact structure:
             return ctx;
         }
         function gatherContext() {
-            let ctx = "=== LD252A SIGNAL DEEP DUMP ===\n";
+            let ctx = "=== LD252A2 SIGNAL DEEP DUMP ===\n";
             ctx += `Timestamp: ${new Date().toISOString()}\n`;
             const activeModal = document.querySelector('.modal[style*="display: flex"]');
             ctx += `\n[UI SURFACE]\nVisible Screen: ${activeModal ? activeModal.id : 'Main Dashboard'}\n`;
@@ -15697,7 +15660,7 @@ Return a JSON object with this exact structure:
             try { ctx = gatherLeanContext(); } catch(e) { ctx = '(Fund context unavailable — open Live Cockpit first)'; }
 
             const systemPrompt =
-                'You are the LD252A System Brain — an expert NPS/MF fund analyst embedded in the Lie Detector app.\n' +
+                'You are the LD252A2 System Brain — an expert NPS/MF fund analyst embedded in the Lie Detector app.\n' +
                 'You analyse Indian NPS and Mutual Fund NAV data using RSI, W-RSI, regime classification (A/B/C), TSL floors, WMA20, and momentum signals.\n' +
                 'Rules: Regime A (W-RSI≥50)=Bull, B (40-50)=Transition, C (<40)=Bear. D-RSI<40=oversold BUY zone. TSL breach=SELL ALL.\n' +
                 'Answer concisely. Use ₹ for prices. Highlight BUY/SELL signals clearly. Below is the current fund data:\n\n' +
@@ -16011,6 +15974,11 @@ Return a JSON object with this exact structure:
     <!-- Hidden PDF file input -->
     <input type="file" id="ld-pdf-file-input" accept="application/pdf" style="display:none;">
 
+    <div id="ld-debug-btn" onclick="window._ldToggleDebug()" title="Auditor State Debug" style="
+        position:fixed;bottom:72px;left:8px;z-index:19999;
+        background:#1a1a2e;color:#00e8a2;border:1px solid #00e8a2;
+        border-radius:6px;padding:4px 8px;font-size:0.55rem;font-weight:700;
+        cursor:pointer;letter-spacing:0.05em;opacity:0.85;user-select:none;">🔬 DEBUG</div>
     <div id="ld-debug-panel" style="
         display:none;position:fixed;bottom:100px;left:8px;z-index:19998;
         width:320px;max-height:70vh;overflow-y:auto;
@@ -16122,7 +16090,7 @@ Return a JSON object with this exact structure:
     })();
     </script>
     <!-- ═══════════════════════════════════════════════════════════════════
-         LD252A — BACKGROUND BA ENGINE v2
+         LD252A2 — BACKGROUND BA ENGINE v2
          ─────────────────────────────────────────────────────────────────
          Priority Order:
            1. Watchlist funds (in order) — check Regime A, run BA, store.
@@ -16139,7 +16107,7 @@ Return a JSON object with this exact structure:
     
     const GAP_MS        = (() => { try { const v=parseInt(localStorage.getItem('ld_api_gap_sec')||'30');  return (v>=3&&v<=100?v:30)*1000;  } catch(e){ return 30_000;  } })();
     const BOOT_DELAY_MS = 6_000;
-    const ADDON_VER     = 'LD252A';
+    const ADDON_VER     = 'LD252A2';
     const RUN_FLAG_KEY  = 'bgbreadth_ran_';
 
     
@@ -16268,7 +16236,7 @@ Return a JSON object with this exact structure:
         
         const userModel = getModel();
         const MODEL_CASCADE = (() => {
-            const ALL = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite'];
+            const ALL = ['gemini-3.1-flash-lite','gemini-3-flash','gemini-3.1-pro','gemini-2.5-flash-lite','gemini-2.5-flash'];
             const startIdx = ALL.indexOf(userModel);
             return startIdx === -1 ? ALL : ALL.slice(startIdx);
         })();
@@ -16342,52 +16310,73 @@ Return a JSON object with this exact structure:
         throw lastErr || new Error('All Gemini models and keys exhausted.');
     }
 
-    // ── Status pill UI (merged into top morning scan banner) ────────────
+    // ── Status pill UI ────────────────────────────────────────────────
     function _makePill() {
-        // Already shown via morningScanBanner — no separate bottom pill needed
-        const mb = document.getElementById('morningScanBanner');
-        if (mb) { mb.style.display = 'block'; mb.style.color = '#009e70'; mb.textContent = '⏳ BA engine starting…'; }
+        if (document.getElementById('bgBreadthPill')) return;
+        const el = document.createElement('div');
+        el.id = 'bgBreadthPill';
+        el.style.cssText = `
+            position:fixed;bottom:14px;left:12px;z-index:25000;
+            background:#1a2332;color:#e2e8f0;font-size:0.62rem;
+            font-family:'Space Mono',monospace;font-weight:600;
+            padding:7px 12px 7px 10px;border-radius:20px;
+            border:1.5px solid #009e70;box-shadow:0 3px 14px rgba(0,0,0,0.35);
+            max-width:300px;line-height:1.4;cursor:pointer;
+            display:flex;align-items:center;gap:6px;transition:opacity 0.3s;`;
+        el.innerHTML = `
+            <span id="bgBreadthDot" style="width:8px;height:8px;border-radius:50%;
+                background:#009e70;flex-shrink:0;
+                animation:bgPillPulse 1.2s ease-in-out infinite;"></span>
+            <span id="bgBreadthCounter" style="font-size:0.58rem;color:#009e70;
+                white-space:nowrap;flex-shrink:0;min-width:36px;"></span>
+            <span id="bgBreadthMsg" style="flex:1;overflow:hidden;text-overflow:ellipsis;
+                white-space:nowrap;">⏳ BA engine starting…</span>
+            <span onclick="document.getElementById('bgBreadthPill').style.display='none'"
+                style="opacity:0.4;font-size:0.8rem;flex-shrink:0;">✕</span>`;
+        const style = document.createElement('style');
+        style.textContent = `@keyframes bgPillPulse{0%,100%{opacity:1}50%{opacity:0.3}}`;
+        document.head.appendChild(style);
+        document.body.appendChild(el);
     }
 
-    // Update counter badge — counts BA analyses for watchlisted funds (matches Watchlist BA view)
+    // Update counter badge — counts actual cached BA analyses for today
     function _updatePillCounter() {
-        const mb = document.getElementById('morningScanBanner');
-        if (!mb) return;
+        const el = document.getElementById('bgBreadthCounter');
+        if (!el) return;
         try {
-            const _dateKey = (() => { const n = new Date(Date.now()+5.5*3600000); return n.toISOString().slice(0,10).replace(/-/g,''); })();
-            const _wl = JSON.parse(localStorage.getItem('ld_watchlist') || '[]');
-            const total = _wl.length;
-            if (total === 0) { mb.textContent = '⏳ BA engine running…'; return; }
+            const _dateKey = _istDate();
+            // Total = today's queue length (funds queued for BA today)
+            const q = _loadQ();
+            const total = q.length;
+            if (total === 0) { el.textContent = ''; return; }
+            
             let cached = 0;
-            _wl.forEach(item => {
+            q.forEach(item => {
                 const ck = `breadth_v1_${(item.code||'').replace(/\W/g,'_')}_${_dateKey}`;
-                try { if (localStorage.getItem(ck)) cached++; } catch(e2) {}
+                try { if (localStorage.getItem(ck)) cached++; } catch(_) {}
             });
-            if (mb.textContent && !mb.textContent.startsWith('⏳')) {
-                mb.textContent = `BA: ${cached}/${total}`;
-            } else {
-                mb.textContent = `⏳ BA: ${cached}/${total}`;
-            }
-        } catch(e) { mb.textContent = '⏳ BA running…'; }
+            el.textContent = `${cached}/${total}`;
+        } catch(e) { el.textContent = ''; }
     }
 
     function _setPillMsg(msg, colour) {
-        const mb = document.getElementById('morningScanBanner');
-        if (mb) {
-            mb.style.display = 'block';
-            mb.style.color = colour || '#009e70';
-            mb.textContent = msg || '⏳ BA engine running…';
-        }
+        const m = document.getElementById('bgBreadthMsg');
+        const d = document.getElementById('bgBreadthDot');
+        if (m) m.textContent = msg;
+        if (d) d.style.background = colour || '#009e70';
         _updatePillCounter();
     }
 
     function _donePill(msg) {
-        const mb = document.getElementById('morningScanBanner');
-        if (mb) {
-            mb.textContent = msg || '✅ BA complete';
-            mb.style.color = '#009e70';
-            setTimeout(() => { if (mb) { mb.style.display = 'none'; } }, 8000);
-        }
+        _setPillMsg(msg, '#009e70');
+        const d = document.getElementById('bgBreadthDot');
+        const c = document.getElementById('bgBreadthCounter');
+        if (d) d.style.animation = 'none';
+        if (c) c.style.color = '#009e70';
+        setTimeout(() => {
+            const p = document.getElementById('bgBreadthPill');
+            if (p) { p.style.opacity = '0'; setTimeout(() => p.remove(), 800); }
+        }, 7000);
     }
 
     
@@ -16819,7 +16808,25 @@ Return a JSON object with this exact structure:
             
             
             _setPillMsg(`⚠ ${finalCnt} stored · ${stillPending.length} pending`, '#f59e0b');
-            _updateBanner(`⚠ BA partial: ${finalCnt} stored · ${stillPending.length} pending — restart scan if needed`, '#c97a00');
+            const _pillEl = document.getElementById('bgBreadthPill');
+            if (_pillEl) {
+                
+                const _oldBtn = _pillEl.querySelector('.bg-restart-btn');
+                if (_oldBtn) _oldBtn.remove();
+                const _restartBtn = document.createElement('span');
+                _restartBtn.className = 'bg-restart-btn';
+                _restartBtn.textContent = '↺ RESTART';
+                _restartBtn.style.cssText =
+                    'margin-left:4px;padding:2px 7px;border-radius:10px;border:1px solid #f59e0b;' +
+                    'color:#f59e0b;font-size:0.55rem;cursor:pointer;flex-shrink:0;white-space:nowrap;';
+                _restartBtn.onclick = function() {
+                    _restartBtn.textContent = '↺ …';
+                    _restartBtn.style.opacity = '0.5';
+                    if (window.bgBreadthForceRun) window.bgBreadthForceRun();
+                };
+                _pillEl.appendChild(_restartBtn);
+            }
+            _updateBanner(`⚠ BA partial: ${finalCnt} stored · ${stillPending.length} pending — tap ↺ RESTART pill`, '#c97a00');
         }
     }
 
@@ -16842,7 +16849,11 @@ Return a JSON object with this exact structure:
         
         _scanToken++;
 
-        // Clear run flags for fresh start
+        
+        const _oldPill = document.getElementById('bgBreadthPill');
+        if (_oldPill) _oldPill.remove();
+
+        
         try { localStorage.removeItem(RUN_FLAG_KEY + d); } catch(e) {}
         try { localStorage.removeItem(`bg_amc_scan_done_${d}`); } catch(e) {}
         try { localStorage.removeItem(`ba_completed_funds_${d}`); } catch(e) {}
@@ -16920,9 +16931,8 @@ Return a JSON object with this exact structure:
     };
     </script>
     <div id="ld-scn-overlay" style="display:none;position:fixed;inset:0;z-index:9999;overflow-y:auto;background:#fff;">
-      <div style="position:sticky;top:0;text-align:right;padding:4px 8px;background:rgba(242,245,249,0.97);border-bottom:1px solid #b0bece;z-index:200;display:flex;align-items:center;justify-content:space-between;">
-        <span id="scnResultCount" style="font-size:0.55rem;color:#888;font-family:'Space Mono',monospace;padding:0 6px;"></span>
-        <button onclick="window.closeLDScanner()" style="background:#c8102e;color:#fff;border:none;padding:4px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Space Mono',monospace;">✕ CLOSE</button>
+      <div style="position:sticky;top:0;text-align:right;padding:4px 8px;background:rgba(242,245,249,0.97);border-bottom:1px solid #b0bece;z-index:200;">
+        <button onclick="window.closeLDScanner()" style="background:#c8102e;color:#fff;border:none;padding:4px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Space Mono',monospace;">&#x2715; CLOSE</button>
       </div>
       <div id="ld-scn-root"></div>
     </div>
@@ -17228,22 +17238,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 })();
 </script>
     <script>
-    window._updateScnCount = function() {
-      const el = document.getElementById('scnResultCount');
-      if (!el) return;
-      try {
-        const raw = localStorage.getItem('ld_scn_results_cache');
-        if (!raw) { el.textContent = ''; return; }
-        const data = JSON.parse(raw);
-        const keys = Object.keys(data);
-        const ok = keys.filter(k => data[k] && !data[k].error && data[k].wRsi != null).length;
-        el.textContent = ok + '/' + keys.length + ' OK';
-      } catch(e) { el.textContent = ''; }
-    }
     window.openLDScanner = function() {
       document.getElementById('ld-scn-overlay').style.display = 'block';
       document.body.style.overflow = 'hidden';
-      _updateScnCount();
       if (!window._scnMounted && window.LDScannerComponent) {
         window._scnMounted = true;
         ReactDOM.createRoot(document.getElementById('ld-scn-root'))
@@ -17708,38 +17705,124 @@ const ALL_INDICES = [{
   symbol: "SMALLCAP.NS",
   exchange: "NSE",
   category: "Strategy"
+}, {
+  name: "Nifty India Defence",
+  symbol: "^NIFTYINDIADEFENCE",
+  exchange: "NSE",
+  category: "Thematic"
+}, {
+  name: "Nifty EV & New Age Auto",
+  symbol: "EVEA.NS",
+  exchange: "NSE",
+  category: "Thematic"
+}, {
+  name: "Nifty Healthcare",
+  symbol: "^NIFTYHC",
+  exchange: "NSE",
+  category: "Sector"
+}, {
+  name: "Nifty Private Bank",
+  symbol: "^CNXPVTBNK",
+  exchange: "NSE",
+  category: "Sector"
+}, {
+  name: "Nifty PSU Bank",
+  symbol: "^CNXPSUBNK",
+  exchange: "NSE",
+  category: "Sector"
+}, {
+  name: "Nifty Fin Services Ex-Bank",
+  symbol: "NIFTY_FIN_SERVICE.NS",
+  exchange: "NSE",
+  category: "Sector"
+}, {
+  name: "Nifty India Manufacturing",
+  symbol: "NIFTY_INDIA_MFG.NS",
+  exchange: "NSE",
+  category: "Thematic"
+}, {
+  name: "Nifty Microcap 250",
+  symbol: "NIFTY_MICROCAP250.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty Total Market",
+  symbol: "NIFTY_TOTAL_MKT.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty LargeMidcap 250",
+  symbol: "NIFTY_LARGEMID250.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty Mid-Small 400",
+  symbol: "NIFTYMIDSML400.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty Smallcap 50",
+  symbol: "NIFTYSMLCAP50.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty Midcap Select",
+  symbol: "NIFTY_MID_SELECT.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty Mid Liquidity 15",
+  symbol: "NIFTYMIDLIQ15.NS",
+  exchange: "NSE",
+  category: "Broad Market"
+}, {
+  name: "Nifty500 Momentum 50",
+  symbol: "NIFTY500_MOMENTUM_50.NS",
+  exchange: "NSE",
+  category: "Strategy"
+}, {
+  name: "Nifty Midcap150 Momentum 50",
+  symbol: "NIFTY_MIDCAP150_MOMENTUM_50.NS",
+  exchange: "NSE",
+  category: "Strategy"
+}, {
+  name: "Nifty100 Quality 30",
+  symbol: "NIFTY100_QUALITY30.NS",
+  exchange: "NSE",
+  category: "Strategy"
+}, {
+  name: "Nifty200 Value 30",
+  symbol: "NIFTY200_VALUE30.NS",
+  exchange: "NSE",
+  category: "Strategy"
+}, {
+  name: "BSE Capital Goods",
+  symbol: "BSE-CG.BO",
+  exchange: "BSE",
+  category: "Sector"
+}, {
+  name: "BSE Consumer Durables",
+  symbol: "BSE-CD.BO",
+  exchange: "BSE",
+  category: "Sector"
+}, {
+  name: "BSE PSU",
+  symbol: "BSE-PSU.BO",
+  exchange: "BSE",
+  category: "Sector"
 }];
 const PROXY = "https://corsproxy.io/?";
 const PROXY_LIST = [
   "https://corsproxy.io/?",
   "https://api.allorigins.win/raw?url=",
-  "https://api.codetabs.com/v1/proxy?quest=",
-  "https://thingproxy.freeboard.io/fetch/",
-  "https://cors-anywhere.herokuapp.com/",
-  "https://proxy.cors.sh/"
+  "https://corsproxy.io/?"
 ];
 let _proxyIdx = 0;
-// Stooq symbol overrides for Yahoo symbols that don't auto-convert
-const STOOQ_OVERRIDES = {
-  'nifty_midcap_100.nse': 'niftymcap100.nse',
-  'nifty_mid_select.nse': 'nifty_midcap_select.nse',
-  'nifty_largemid250.nse': 'nifty_largemid250.nse',
-  'nifty_microcap250.nse': 'nifty_microcap250.nse',
-  'nifty_total_mkt.nse': 'nifty_total_mkt.nse',
-  'nifty_fin_service.nse': 'nifty_fin_service.nse',
-  'nifty_highbeta_50.nse': 'nifty_highbeta_50.nse',
-  'nifty_india_mfg.nse': 'nifty_india_mfg.nse',
-  'nifty_alpha_low_vol_30.nse': 'nifty_alpha_low_vol_30.nse',
-  'nifty100_quality_30.nse': 'nifty100_quality_30.nse',
-  'nifty100_low_vol_30.nse': 'nifty100_low_vol_30.nse',
-  'nifty200_quality_30.nse': 'nifty200_quality_30.nse',
-};
 async function _fetchWithFallback(url, opts) {
   for (let attempt = 0; attempt < PROXY_LIST.length; attempt++) {
     const px = PROXY_LIST[(_proxyIdx + attempt) % PROXY_LIST.length];
     try {
-      const targetUrl = px ? px + encodeURIComponent(url) : url;
-      const r = await fetch(targetUrl, opts);
+      const r = await fetch(px + encodeURIComponent(url), opts);
       if (r.ok) return r;
       if (r.status === 429 || r.status === 403) {
         _proxyIdx = (_proxyIdx + 1) % PROXY_LIST.length;
@@ -17861,7 +17944,7 @@ async function fetchIdx(symbol) {
   const dUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`;
   const qtUrl = `https://query1.finance.yahoo.com/v8/finance/quote?symbols=${symbol}`;
   try {
-    const sig = { signal: AbortSignal.timeout(8000) };
+    const sig = { signal: AbortSignal.timeout(15000) };
     const [wkR, dR, qtR] = await Promise.all([
       _fetchWithFallback(wkUrl, sig),
       _fetchWithFallback(dUrl, sig),
@@ -17870,55 +17953,31 @@ async function fetchIdx(symbol) {
     const wkD = wkR?.ok ? await wkR.json() : null,
       dD = dR?.ok ? await dR.json() : null,
       qtD = qtR?.ok ? await qtR.json() : null;
-    let wC = wkD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-    let dC = dD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-    let q = qtD?.quoteResponse?.result?.[0] || null;
-    // Check if we have valid (non-null) prices, not just array entries
-    const wValid = wC.filter(x => x != null && !isNaN(x));
-    const dValid = dC.filter(x => x != null && !isNaN(x));
-    // Fallback to stooq.com if Yahoo returned no usable data
-    if (!wValid.length && !dValid.length) {
-      try {
-        // Convert Yahoo symbol to stooq format
-        let stooqSym = symbol
-          .replace(/\.NS$/i, '.nse')   // NSE stocks: .NS → .nse
-          .replace(/\.BO$/i, '.bo')    // BSE stocks: .BO → .bo
-          .toLowerCase();
-        // Apply override map for symbols that don't auto-convert to stooq
-        if (STOOQ_OVERRIDES[stooqSym]) stooqSym = STOOQ_OVERRIDES[stooqSym];
-        // Lipper/Refinitiv codes (0P000...) won't work on stooq
-        if (stooqSym.match(/^0p/)) throw new Error('Lipper code');
-        // Try direct stooq fetch first, then via proxy fallback
-        const stooqUrl = `https://stooq.com/q/d/l/?s=${stooqSym}&i=d`;
-        let stooqRes;
-        try { stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(5000) }); } catch(_){}
-        if (!stooqRes || !stooqRes.ok) {
-          const fallback = await _fetchWithFallback(stooqUrl, { signal: AbortSignal.timeout(8000) });
-          if (fallback?.ok) stooqRes = fallback;
-        }
-        if (stooqRes && stooqRes.ok) {
-          const csv = await stooqRes.text();
-          const lines = csv.trim().split('\n').slice(1);
-          const closes = lines.map(l => { const c = parseFloat(l.split(',')[4]); return isNaN(c) ? null : c; }).filter(c => c !== null);
-          if (closes.length > 10) {
-            dC = closes;
-            wC = closes.filter((_, i) => i % 5 === 4 || i === closes.length - 1);
-            q = { regularMarketPrice: closes[closes.length - 1] };
-          }
-        }
-      } catch(_stq) { /* stooq fallback failed */ }
-    }
-    const price = q?.regularMarketPrice ?? (wC.length ? wC[wC.length - 1] : null);
+    const wC = wkD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    const dC = dD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    const q = qtD?.quoteResponse?.result?.[0] || null;
+    const price = q?.regularMarketPrice ?? (dC.length ? dC[dC.length - 1] : (wC.length ? wC[wC.length - 1] : null));
+
+    // ── STALE W-RSI FIX ────────────────────────────────────────────────
+    // Yahoo's last weekly candle is the CURRENT open week — it closes on Friday.
+    // Mon-Thu that candle reflects last Friday's close → regime is 4 days old.
+    // Fix: replace the last open weekly candle with today's live price so
+    // W-RSI is computed on current price, not last week's close.
+    const wCLive = wC.length && price != null
+        ? [...wC.slice(0, -1), price]   // swap last open candle → live price
+        : wC;
+    // ──────────────────────────────────────────────────────────────────
+
     const vd = dC.filter(x => x != null && !isNaN(x));
     const changePct = vd.length >= 2 ? parseFloat(((vd[vd.length - 1] - vd[vd.length - 2]) / vd[vd.length - 2] * 100).toFixed(2)) : null;
-    const w4 = calcRSI(wC, 4),
-      w8 = calcRSI(wC, 8),
-      w14 = calcRSI(wC, 14);
+    const w4 = calcRSI(wCLive, 4),
+      w8 = calcRSI(wCLive, 8),
+      w14 = calcRSI(wCLive, 14);
     const wRsi4 = w4.length ? w4[w4.length - 1] : null,
       wRsi8 = w8.length ? w8[w8.length - 1] : null,
       wRsi14 = w14.length ? w14[w14.length - 1] : null;
     const wRsi = wRsi4,
-      wma20Price = calcWMA(wC, 20),
+      wma20Price = calcWMA(wCLive, 20),
       wma20Rsi = calcWMA(w4, 20);
     const tsiArr = calcTSI(dC, 21);
     const dTsiCurr = tsiArr.length > 0 ? tsiArr[tsiArr.length - 1] : null,
@@ -18094,6 +18153,7 @@ function LDScanner() {
   const stopRef = useRef(false),
     baStopRef = useRef(false);
   const vix = results["^INDIAVIX"]?.price ?? null;
+  const vixChgPct = results["^INDIAVIX"]?.changePct ?? null;
   const F = {
     fontFamily: "'Space Mono','Courier New',monospace",
     color: "#000"
@@ -18120,7 +18180,7 @@ function LDScanner() {
         responseMimeType: "application/json"
       }
     };
-    for (const m of ["gemini-3.1-flash-lite", "gemini-3-flash", "gemini-3.1-pro", "gemini-2.5-flash-lite"]) {
+    for (const m of ["gemini-3.1-flash-lite", "gemini-3-flash", "gemini-3.1-pro", "gemini-2.5-flash-lite", "gemini-2.5-flash"]) {
       try {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${key}`, {
           method: "POST",
@@ -18160,35 +18220,32 @@ function LDScanner() {
     const toFetch = ALL_INDICES.filter(i => i.symbol);
     let done = 0,
       tmp = {};
-    const BATCH = 50;
-    for (let b = 0; b < toFetch.length; b += BATCH) {
+    for (const idx of toFetch) {
       if (stopRef.current) break;
-      const batch = toFetch.slice(b, b + BATCH);
       setProgress({
         done,
         total: toFetch.length,
-        label: "Batch " + (b / BATCH + 1) + "/" + Math.ceil(toFetch.length / BATCH)
+        label: "Scanning " + idx.name + "..."
       });
-      const batchResults = await Promise.allSettled(batch.map(idx => fetchIdx(idx.symbol)));
-      batch.forEach((idx, i) => {
-        if (stopRef.current) return;
-        const r = batchResults[i];
-        tmp = { ...tmp, [idx.symbol]: r.status === 'fulfilled' ? r.value : { error: true } };
-        done++;
+      const d = await fetchIdx(idx.symbol);
+      done++;
+      tmp = {
+        ...tmp,
+        [idx.symbol]: d
+      };
+      setResults({
+        ...tmp
       });
-      setResults({ ...tmp });
-      const okCount = Object.values(tmp).filter(v => v && !v.error && v.wRsi != null).length;
-      if (typeof window._updateScnCount === 'function') window._updateScnCount();
       setProgress({
         done,
         total: toFetch.length,
-        label: done + "/" + toFetch.length + " scanned (" + okCount + " OK)"
+        label: idx.name
       });
+      await sleep(500);
     }
     // Save to localStorage
     const savedDate = saveCache(tmp);
     setCacheDate(savedDate);
-    if (typeof window._updateScnCount === 'function') window._updateScnCount();
     setProgress({
       done: toFetch.length,
       total: toFetch.length,
@@ -18533,6 +18590,25 @@ function LDScanner() {
     }
   }, vix != null && /*#__PURE__*/React.createElement("span", {
     style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 3,
+      whiteSpace: "nowrap"
+    }
+  }, vixChgPct != null && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 10,
+      fontWeight: 700,
+      padding: "3px 6px",
+      background: vixChgPct > 0 ? "#d4edda" : "#fde8e8",
+      border: `1px solid ${vixChgPct > 0 ? accent : red}`,
+      color: vixChgPct > 0 ? accent : red,
+      ...F,
+      whiteSpace: "nowrap"
+    }
+  }, vixChgPct > 0 ? "▲" : "▼", Math.abs(vixChgPct).toFixed(2), "%"),
+  /*#__PURE__*/React.createElement("span", {
+    style: {
       fontSize: 10,
       fontWeight: 700,
       padding: "3px 8px",
@@ -18541,7 +18617,7 @@ function LDScanner() {
       ...F,
       whiteSpace: "nowrap"
     }
-  }, "VIX ", vix.toFixed(1), " ", vix > 20 ? "⚠" : "✓"))), scanning && /*#__PURE__*/React.createElement("div", {
+  }, "VIX ", vix.toFixed(1), " ", vix > 20 ? "⚠" : "✓")))), scanning && /*#__PURE__*/React.createElement("div", {
     style: {
       height: 2,
       background: surf2
@@ -18650,7 +18726,10 @@ function LDScanner() {
     title: "% mkt-cap weight Regime A"
   }, "%Wt-A", si("baPct")))), /*#__PURE__*/React.createElement("tbody", null, rows.map((r, i) => {
     if (!r.wRsi && !r.error) return null;
-    if (r.error) return null;
+    if (r.error) return /*#__PURE__*/React.createElement("tr", { key: r.symbol, style: { background: "#fff8f8" } },
+      /*#__PURE__*/React.createElement("td", { style: { ...td1S, color: red, fontSize: 10 } }, r.name),
+      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#c8102e", fontSize: 10, fontStyle: "italic" } }, "⚠ fetch error — CORS block or Yahoo timeout. Retry scan.")
+    );
     const et = runET(r, vix);
     const ba = baRes[r.symbol];
     const rowBg = i % 2 === 0 ? "#fff" : surf;
@@ -18685,14 +18764,16 @@ function LDScanner() {
         color: red
       }
     }, "ERR");else {
-      const bc = ba.pct >= 60 ? "#d4edda" : ba.pct >= 40 ? "#fff3cd" : "#fde8e8";
-      const bb = ba.pct >= 60 ? accent : ba.pct >= 40 ? accent2 : red;
+      const bc = ba.pct >= 70 ? "#006400" : ba.pct >= 60 ? "#d4edda" : ba.pct >= 40 ? "#fff3cd" : "#fde8e8";
+      const bb = ba.pct >= 70 ? "#004d00" : ba.pct >= 60 ? accent : ba.pct >= 40 ? accent2 : red;
+      const fc = ba.pct >= 70 ? "#fff" : "#000";
       const cb = ba.conf === "HIGH" ? "●" : ba.conf === "MEDIUM" ? "◑" : "○";
       baCell = /*#__PURE__*/React.createElement("span", {
         style: {
           fontSize: 10,
           fontWeight: 700,
           background: bc,
+          color: fc,
           padding: "1px 5px",
           border: `1px solid ${bb}`,
           ...F
@@ -18878,4 +18959,3 @@ function LDScanner() {
 window.LDScannerComponent = LDScanner;
     </script>
     <!-- ═══════════════ END LD SCANNER ADD-ON ═══════════════ -->
-    <!-- LD253A1 — Changelog: safe config import, calcMFATR off-by-one fix, showCustomRationale stub fixed, zoom reset robustness, cache-busting for regime scanners, debug btn moved to API key box, alert NAV line removed, watchlist buttons removed, BA counter synced to watchlist, bottom BA pill merged into top banner -->
