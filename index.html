@@ -17228,7 +17228,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 })();
 </script>
     <script>
-    function _updateScnCount() {
+    window._updateScnCount = function() {
       const el = document.getElementById('scnResultCount');
       if (!el) return;
       try {
@@ -17871,8 +17871,11 @@ async function fetchIdx(symbol) {
     let wC = wkD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
     let dC = dD?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
     let q = qtD?.quoteResponse?.result?.[0] || null;
-    // Fallback to stooq.com if Yahoo CORS blocked (stooq supports CORS on mobile)
-    if (!wC.length && !dC.length) {
+    // Check if we have valid (non-null) prices, not just array entries
+    const wValid = wC.filter(x => x != null && !isNaN(x));
+    const dValid = dC.filter(x => x != null && !isNaN(x));
+    // Fallback to stooq.com if Yahoo returned no usable data
+    if (!wValid.length && !dValid.length) {
       try {
         // Convert Yahoo symbol to stooq format
         let stooqSym = symbol
@@ -17883,9 +17886,15 @@ async function fetchIdx(symbol) {
         if (STOOQ_OVERRIDES[stooqSym]) stooqSym = STOOQ_OVERRIDES[stooqSym];
         // Lipper/Refinitiv codes (0P000...) won't work on stooq
         if (stooqSym.match(/^0p/)) throw new Error('Lipper code');
+        // Try direct stooq fetch first, then via proxy fallback
         const stooqUrl = `https://stooq.com/q/d/l/?s=${stooqSym}&i=d`;
-        const stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(6000) });
-        if (stooqRes.ok) {
+        let stooqRes;
+        try { stooqRes = await fetch(stooqUrl, { signal: AbortSignal.timeout(5000) }); } catch(_){}
+        if (!stooqRes || !stooqRes.ok) {
+          const fallback = await _fetchWithFallback(stooqUrl, { signal: AbortSignal.timeout(8000) });
+          if (fallback?.ok) stooqRes = fallback;
+        }
+        if (stooqRes && stooqRes.ok) {
           const csv = await stooqRes.text();
           const lines = csv.trim().split('\n').slice(1);
           const closes = lines.map(l => { const c = parseFloat(l.split(',')[4]); return isNaN(c) ? null : c; }).filter(c => c !== null);
@@ -18167,6 +18176,7 @@ function LDScanner() {
       });
       setResults({ ...tmp });
       const okCount = Object.values(tmp).filter(v => v && !v.error && v.wRsi != null).length;
+      if (typeof window._updateScnCount === 'function') window._updateScnCount();
       setProgress({
         done,
         total: toFetch.length,
@@ -18176,6 +18186,7 @@ function LDScanner() {
     // Save to localStorage
     const savedDate = saveCache(tmp);
     setCacheDate(savedDate);
+    if (typeof window._updateScnCount === 'function') window._updateScnCount();
     setProgress({
       done: toFetch.length,
       total: toFetch.length,
@@ -18637,10 +18648,7 @@ function LDScanner() {
     title: "% mkt-cap weight Regime A"
   }, "%Wt-A", si("baPct")))), /*#__PURE__*/React.createElement("tbody", null, rows.map((r, i) => {
     if (!r.wRsi && !r.error) return null;
-    if (r.error) return /*#__PURE__*/React.createElement("tr", { key: r.symbol, style: { background: "#fff8f8" } },
-      /*#__PURE__*/React.createElement("td", { style: { ...td1S, color: "#999", fontSize: 10 } }, r.name),
-      /*#__PURE__*/React.createElement("td", { colSpan: 14, style: { ...tdS, color: "#999", fontSize: 10, fontStyle: "italic" } }, "No data")
-    );
+    if (r.error) return null;
     const et = runET(r, vix);
     const ba = baRes[r.symbol];
     const rowBg = i % 2 === 0 ? "#fff" : surf;
