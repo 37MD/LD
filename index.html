@@ -18454,7 +18454,21 @@ function LDScanner() {
       borderRadius: 3,
       background: "#fff"
     }
-  }, "Index Scanned: ", Object.values(results).filter(function(x){return x&&!x.error}).length, "/", ALL_INDICES.filter(function(x){return x.symbol}).length), /*#__PURE__*/React.createElement("div", {
+  }, "Index Scanned: ", Object.values(results).filter(function(x){return x&&!x.error}).length, "/", ALL_INDICES.filter(function(x){return x.symbol}).length), !scanning && /*#__PURE__*/React.createElement("button", {
+    onClick: doScan,
+    style: {
+      background: "transparent",
+      border: "1px solid #b0bece",
+      borderRadius: 3,
+      padding: "1px 6px",
+      fontSize: 12,
+      cursor: "pointer",
+      color: "#000",
+      lineHeight: "1.3",
+      fontFamily: "'Space Mono','Courier New',monospace"
+    },
+    title: "Rescan all indices"
+  }, "\u21BB"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
