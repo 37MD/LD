@@ -18454,7 +18454,37 @@ function LDScanner() {
       borderRadius: 3,
       background: "#fff"
     }
-  }, "Index Scanned: ", Object.values(results).filter(function(x){return x&&!x.error}).length, "/", ALL_INDICES.filter(function(x){return x.symbol}).length), /*#__PURE__*/React.createElement("div", {
+  }, "Scanned:", Object.values(results).filter(function(x){return x&&!x.error}).length, "/", !scanning ? /*#__PURE__*/React.createElement("button", {
+    onClick: doScan,
+    style: {
+      background: "transparent",
+      border: "none",
+      padding: "0 1px",
+      fontSize: 11,
+      fontWeight: 700,
+      cursor: "pointer",
+      color: "#000",
+      fontFamily: "'Space Mono','Courier New',monospace",
+      lineHeight: "1.3",
+      textDecoration: "underline dotted",
+      textUnderlineOffset: 2
+    },
+    title: "Tap to rescan all"
+  }, ALL_INDICES.filter(function(x){return x.symbol}).length) : ALL_INDICES.filter(function(x){return x.symbol}).length, !scanning && /*#__PURE__*/React.createElement("button", {
+    onClick: doScan,
+    style: {
+      background: "transparent",
+      border: "1.5px solid #b0bece",
+      borderRadius: 4,
+      padding: "1px 7px",
+      fontSize: 12,
+      cursor: "pointer",
+      color: "#000",
+      fontFamily: "'Space Mono','Courier New',monospace",
+      lineHeight: "1.3"
+    },
+    title: "Rescan all indices"
+  }, "\u21BB"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
