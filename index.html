@@ -18629,54 +18629,7 @@ function LDScanner() {
       width: pct + "%",
       transition: "width 0.3s"
     }
-  })), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(4,1fr)",
-      gap: 3,
-      padding: "3px 6px 0"
-    }
-  }, [{
-    lbl: "Total Index to be scanned",
-    val: ALL_INDICES.filter(function(i){return i.symbol;}).length + "",
-    col: bdr2
-  }, {
-    lbl: "Total Index Scanned",
-    val: hasData ? Object.keys(results).filter(function(s){return results[s]&&!results[s].error;}).length + "" : "0",
-    col: accent
-  }, {
-    lbl: "Total Index Displayed",
-    val: rows.length + "",
-    col: accent
-  }, {
-    lbl: "Index Not Scanned",
-    val: hasData ? (ALL_INDICES.filter(function(i){return i.symbol;}).length - Object.keys(results).filter(function(s){return results[s]&&!results[s].error;}).length) + "" : String(ALL_INDICES.filter(function(i){return i.symbol;}).length),
-    col: red
-  }].map(function(s){return /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: surf2,
-      border: "1px solid " + s.col,
-      borderRadius: 4,
-      padding: "3px 6px",
-      textAlign: "center",
-      display: "flex",
-      flexDirection: "column",
-      gap: 1,
-      fontFamily: "'Space Mono','Courier New',monospace"
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 7,
-      color: "#000",
-      letterSpacing: "0.5px"
-    }
-  }, s.lbl), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 13,
-      fontWeight: 700,
-      color: s.col
-    }
-  }, s.val))})), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:3,padding:"3px 6px 0"}}, /*#__PURE__*/function(){var total=ALL_INDICES.filter(function(i){return i.symbol;}).length;var scanned=hasData?Object.keys(results).filter(function(k){return results[k]&&!results[k].error;}).length:0;var displayed=rows.length;var notscanned=total-scanned;var items=[["Total Index to be scanned",String(total),bdr2],["Total Index Scanned",String(scanned),accent],["Total Index Displayed",String(displayed),accent],["Index Not Scanned",String(notscanned),red]];return items.map(function(item,i){return /*#__PURE__*/React.createElement("div",{key:i,style:{background:surf2,border:"1px solid "+item[2],borderRadius:4,padding:"3px 6px",textAlign:"center",display:"flex",flexDirection:"column",gap:1,fontFamily:"'Space Mono','Courier New',monospace"}}, /*#__PURE__*/React.createElement("span",{style:{fontSize:7,color:"#000",letterSpacing:"0.5px"}},item[0]), /*#__PURE__*/React.createElement("span",{style:{fontSize:13,fontWeight:700,color:item[2]}},item[1]));});}()), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: "4px 6px"
     }
