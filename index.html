@@ -2,14 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Indian Daily Dash (Text-Only Portrait)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>खिचडी 1B — Recipes · Stories · Videos</title>
+<meta name="theme-color" content="#ece0c4">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="खिचडी 1B">
+<meta name="application-name" content="खिचडी 1B">
+<meta name="description" content="Marathi recipes, stories, videos and lifestyle — ad-free reader">
+<link rel="manifest" href="#" id="pwa-manifest-link">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%23ece0c4'/%3E%3Ccircle cx='72' cy='96' r='48' fill='%231a1a1a'/%3E%3Ccircle cx='72' cy='94' r='40' fill='%23333'/%3E%3Crect x='112' y='88' width='52' height='10' rx='3' fill='%231a1a1a'/%3E%3Crect x='112' y='90' width='46' height='6' rx='2' fill='%23444'/%3E%3Crect x='158' y='84' width='12' height='18' rx='4' fill='%23111'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%23ece0c4'/%3E%3Ccircle cx='72' cy='96' r='48' fill='%231a1a1a'/%3E%3Ccircle cx='72' cy='94' r='40' fill='%23333'/%3E%3Crect x='112' y='88' width='52' height='10' rx='3' fill='%231a1a1a'/%3E%3Crect x='112' y='90' width='46' height='6' rx='2' fill='%23444'/%3E%3Crect x='158' y='84' width='12' height='18' rx='4' fill='%23111'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
 <style>
   /* Base styling ensuring strictly black fonts only */
   body {
     font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #d6c9b3;
+    background-color: #c9bca3;
     background-image:
       repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.015) 1px, rgba(0,0,0,0.015) 2px);
     margin: 0;
@@ -28,7 +38,7 @@
   .mobile-container {
     width: 100%;
     max-width: 960px; 
-    background-color: #faf3e0;
+    background-color: #ece0c4;
     min-height: 100vh;
     box-shadow: 0 4px 15px rgba(0,0,0,0.6);
     padding: 15px;
@@ -40,7 +50,16 @@
     border-bottom: 3px double #000;
     padding: 22px 20px 16px;
     text-align: center;
-    background: #faf3e0;
+    background: #ece0c4;
+    position: relative;
+  }
+  .masthead-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   .masthead-tagline {
     font-family: 'IBM Plex Mono', monospace;
@@ -51,64 +70,42 @@
   }
   .masthead-title {
     font-family: 'Noto Sans Devanagari', sans-serif;
-    font-size: clamp(28px, 5vw, 52px);
+    font-size: clamp(56px, 10vw, 104px);
     font-weight: 700;
     line-height: 1.2;
     margin: 8px 0;
   }
   .masthead-title .pan-icon {
-    font-size: 0.7em;
+    font-size: 1em;
     vertical-align: middle;
     margin-left: 6px;
+    display: inline-block;
   }
-  .controls-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 8px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .masthead-title .pan-icon svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: middle;
+    display: block;
   }
-
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 25px;
-    padding: 15px 10px;
-    border: 2px solid #000000;
-    background-color: #4a6fa5;
-  }
-
-  #lang-select {
-    background-color: #e9c46a;
-    border: 2px solid #000000;
+  .masthead-controls #lang-select {
+    background: #e9c46a;
+    border: 2px solid #000;
     padding: 6px 8px;
     font-weight: bold;
     font-size: 0.9em;
     cursor: pointer;
   }
-
-  .reset-small-btn {
-    background-color: #d4a373;
-    border: 2px solid #000000;
+  .masthead-controls .reset-small-btn {
+    background: #d4a373;
+    border: 2px solid #000;
     padding: 8px 12px;
     font-weight: bold;
     cursor: pointer;
     font-size: 0.8em;
     white-space: nowrap;
-    margin-left: auto;
-    align-self: center;
   }
-
-  .reset-small-btn:hover {
-    background-color: #c4956a;
-  }
-
-  .header h1 {
-    margin: 0;
-    font-size: 1.8em; 
-    line-height: 1.2;
+  .masthead-controls .reset-small-btn:hover {
+    background: #c4956a;
   }
 
   .category-title {
@@ -127,17 +124,17 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 25px;
+    margin: 16px 0 25px;
   }
 
   .section-btn {
     flex: 1;
     min-width: 100px;
     padding: 14px 10px;
-    border: 3px solid #000000;
+    border: 2px solid #000000;
+    border-radius: 20px;
     text-align: center;
     font-size: 1.1em;
-    font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
@@ -150,7 +147,7 @@
 
   .section-btn.active {
     filter: brightness(0.8);
-    border-width: 4px;
+    border-width: 3px;
   }
 
   .section-content {
@@ -183,6 +180,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     font-size: 1.2em;
+    font-weight: normal;
     display: flex;
     flex-direction: column; 
     align-items: flex-start;
@@ -330,7 +328,7 @@
     top: 0; right: 0; bottom: 0;
     width: 100%;
     max-width: 780px;
-    background: #faf3e0;
+    background: #ece0c4;
     z-index: 1000;
     box-shadow: -4px 0 20px rgba(0,0,0,0.4);
     transform: translateX(100%);
@@ -507,19 +505,18 @@
 <div class="mobile-container">
   
   <div class="masthead">
-    <div class="masthead-tagline">Indian Daily Dash</div>
-    <div class="masthead-title">खिचडी<span class="pan-icon">🍳</span></div>
+    <div class="masthead-controls">
+      <div id="google_translate_element" style="display:inline-block"></div>
+      <select id="lang-select">
+        <option value="marathi">Marathi</option>
+        <option value="hindi">Hindi</option>
+        <option value="english">English</option>
+      </select>
+      <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
+    </div>
+    <div class="masthead-tagline">खिचडी 1B</div>
+    <div class="masthead-title">खिचडी<span class="pan-icon"><svg viewBox="0 0 120 100"><ellipse cx="36" cy="52" rx="30" ry="28" fill="#1a1a1a"/><ellipse cx="36" cy="50" rx="26" ry="24" fill="#3a3a3a"/><ellipse cx="36" cy="49" rx="22" ry="20" fill="#555"/><rect x="60" y="45" width="42" height="8" rx="2" fill="#1a1a1a"/><rect x="60" y="47" width="38" height="4" rx="2" fill="#444"/><rect x="98" y="42" width="10" height="14" rx="3" fill="#111"/><ellipse cx="36" cy="49" rx="14" ry="12" fill="#6a6a6a"/><ellipse cx="36" cy="48" rx="10" ry="8" fill="#888"/></svg></span></div>
     <div class="masthead-tagline">Recipes · Stories · Videos · YouTube</div>
-  </div>
-
-  <div class="controls-row">
-    <div id="google_translate_element" style="display:inline-block"></div>
-    <select id="lang-select">
-      <option value="marathi">Marathi</option>
-      <option value="hindi">Hindi</option>
-      <option value="english">English</option>
-    </select>
-    <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
   </div>
 
   <div id="section-buttons"></div>
@@ -585,20 +582,25 @@
   // SHOPPING & PRICE TRACKER LOGIC
   // ==========================================
   function checkPriceHistory() {
-    const url = document.getElementById('price-tracker-input').value.trim();
-    if (!url) {
-      alert("Please paste a product link first.");
+    const input = document.getElementById('price-tracker-input').value.trim();
+    if (!input) {
+      alert("Please enter a product name or paste a product URL first.");
       return;
     }
     
-    // Route Amazon links to CamelCamelCamel India for direct graph loading
-    if (url.toLowerCase().includes('amazon.in')) {
-       window.open("https://in.camelcamelcamel.com/search?sq=" + encodeURIComponent(url), '_blank');
-    } 
-    // Route Flipkart, Myntra, and others to PriceHistoryApp
-    else {
-       alert("Redirecting to PriceHistoryApp. Paste your link in their search bar to view the graph.");
-       window.open("https://pricehistoryapp.com/", '_blank');
+    const isUrl = input.match(/^https?:\/\//) || input.includes('.') && input.includes('/');
+    
+    if (isUrl) {
+      // Route Amazon links to CamelCamelCamel India
+      if (input.toLowerCase().includes('amazon.in')) {
+        window.open("https://in.camelcamelcamel.com/search?sq=" + encodeURIComponent(input), '_blank');
+      } else {
+        window.open("https://pricehistoryapp.com/search?q=" + encodeURIComponent(input), '_blank');
+      }
+    } else {
+      // Product name → search price history on Keepa + Google Shopping
+      window.open("https://keepa.com/#!search?q=" + encodeURIComponent(input), '_blank');
+      window.open("https://www.google.com/search?tbm=shop&q=" + encodeURIComponent(input) + " price", '_blank');
     }
   }
 
@@ -738,32 +740,6 @@
   // Complete array of all sections including the new Travel News section
   const mainSections = [
     {
-      title: "Travel",
-      categories: [
-        {
-          title: "Travel & Tourism (India)",
-          injectTip: false,
-          feeds: [
-            { name: "Top Destinations", language: "English", url: "https://news.google.com/rss/search?q=places+to+visit+in+India+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
-            { name: "Incredible India News", language: "English", url: "https://news.google.com/rss/search?q=Indian+tourism+travel+news&hl=en-IN&gl=IN&ceid=IN:en" }
-          ]
-        }
-      ]
-    },
-    {
-      title: "Shopping",
-      categories: [
-        {
-          title: "Shopping & Offers News",
-          injectTip: false,
-          feeds: [
-            { name: "Sale & Festival Offers", language: "English", url: "https://news.google.com/rss/search?q=Amazon+OR+Flipkart+OR+Myntra+sale+offers+India&hl=en-IN&gl=IN&ceid=IN:en" },
-            { name: "Price Drop Alerts", language: "English", url: "https://news.google.com/rss/search?q=price+drop+smartphones+gadgets+India&hl=en-IN&gl=IN&ceid=IN:en" }
-          ]
-        }
-      ]
-    },
-    {
       title: "News",
       categories: [
         {
@@ -796,42 +772,104 @@
           title: "Loksatta (लोकसत्ता)",
           injectTip: false,
           feeds: [
-            { name: "Loksatta - Maharashtra", language: "Marathi", url: "https://www.loksatta.com/maharashtra/feed/" },
-            { name: "Loksatta - Desh Videsh", language: "Marathi", url: "https://www.loksatta.com/desh-videsh/feed/" },
-            { name: "Loksatta - Krida", language: "Marathi", url: "https://www.loksatta.com/krida/feed/" },
-            { name: "Loksatta - Manoranjan", language: "Marathi", url: "https://www.loksatta.com/manoranjan/feed/" },
-            { name: "Loksatta - Mumbai", language: "Marathi", url: "https://www.loksatta.com/cities/mumbai/feed/" },
-            { name: "Loksatta - Pune", language: "Marathi", url: "https://www.loksatta.com/cities/pune/feed/" },
-            { name: "Loksatta - Explained", language: "Marathi", url: "https://www.loksatta.com/explained/feed/" },
-            { name: "Loksatta - Lifestyle", language: "Marathi", url: "https://www.loksatta.com/lifestyle/feed/" },
-            { name: "Loksatta - Sampadkiya", language: "Marathi", url: "https://www.loksatta.com/sampadkiya/feed/" },
-            { name: "Loksatta - Tech", language: "Marathi", url: "https://www.loksatta.com/tech/feed/" },
-            { name: "Loksatta - Trending", language: "Marathi", url: "https://www.loksatta.com/trending/feed/" },
-            { name: "Loksatta - Auto", language: "Marathi", url: "https://www.loksatta.com/auto/feed/" },
-            { name: "Loksatta - Astrology", language: "Marathi", url: "https://www.loksatta.com/astrology/feed/" },
-            { name: "Loksatta - IPL", language: "Marathi", url: "https://www.loksatta.com/krida/ipl/feed/" }
-          ]
-        },
-        {
-          title: "Divya Marathi (दिव्य मराठी)",
-          injectTip: false,
-          feeds: [
-            { name: "Divya Marathi - Maharashtra", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5492.xml" },
-            { name: "Divya Marathi - National", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5489.xml" },
-            { name: "Divya Marathi - International", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5490.xml" },
-            { name: "Divya Marathi - Sports", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5491.xml" },
-            { name: "Divya Marathi - Entertainment", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12018.xml" },
-            { name: "Divya Marathi - Business", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-5558.xml" },
-            { name: "Divya Marathi - Lifestyle", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12021.xml" },
-            { name: "Divya Marathi - Tech-Auto", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12023.xml" },
-            { name: "Divya Marathi - Opinion", language: "Marathi", url: "https://divyamarathi.bhaskar.com/rss-v1--category-12019.xml" }
+            { name: "Loksatta - Latest", language: "Marathi", url: "https://www.loksatta.com/latest-news/feed" },
+            { name: "Loksatta - Maharashtra", language: "Marathi", url: "https://www.loksatta.com/maharashtra-news/feed" },
+            { name: "Loksatta - Mumbai", language: "Marathi", url: "https://www.loksatta.com/mumbai-news/feed" }
           ]
         },
         {
           title: "Maharashtra Times (महाराष्ट्र टाइम्स)",
           injectTip: false,
           feeds: [
-            { name: "Maharashtra Times - Main", language: "Marathi", url: "https://maharashtratimes.com/rssfeedsdefault.cms" }
+            { name: "Maharashtra Times - Main", language: "Marathi", url: "https://maharashtratimes.com/rssfeeds/4836692.cms" }
+          ]
+        },
+        {
+          title: "TV9 Marathi (टीव्ही९ मराठी)",
+          injectTip: false,
+          feeds: [
+            { name: "TV9 Marathi - Main", language: "Marathi", url: "https://www.tv9marathi.com/rss/latest-news.xml" }
+          ]
+        },
+        {
+          title: "BBC Marathi (बीबीसी मराठी)",
+          injectTip: false,
+          feeds: [
+            { name: "BBC Marathi - Main", language: "Marathi", url: "https://www.bbc.com/marathi/index.xml" }
+          ]
+        },
+        {
+          title: "Breaking News (English)",
+          injectTip: false,
+          feeds: [
+            { name: "Google News - India", language: "English", url: "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Google News - India Top", language: "English", url: "https://news.google.com/rss/search?q=India+news+top+stories&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "India Business News", language: "English", url: "https://news.google.com/rss/search?q=India+business+economy+market+news&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "India Tech News", language: "English", url: "https://news.google.com/rss/search?q=India+technology+AI+smartphone+gadget+news&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "India Sports News", language: "English", url: "https://news.google.com/rss/search?q=India+sports+cricket+football+news&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "India Entertainment", language: "English", url: "https://news.google.com/rss/search?q=Bollywood+India+entertainment+movie+news&hl=en-IN&gl=IN&ceid=IN:en" }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Travel",
+      categories: [
+        {
+          title: "Travel & Tourism (India)",
+          injectTip: false,
+          feeds: [
+            { name: "Top Destinations", language: "English", url: "https://news.google.com/rss/search?q=places+to+visit+in+India+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Incredible India News", language: "English", url: "https://news.google.com/rss/search?q=Indian+tourism+travel+news&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "India Travel Guide", language: "English", url: "https://news.google.com/rss/search?q=India+travel+destinations+hill+stations+beaches&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Adventure & Trekking India", language: "English", url: "https://news.google.com/rss/search?q=adventure+trekking+travel+India+Himalayas&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Heritage & Culture Travel", language: "English", url: "https://news.google.com/rss/search?q=heritage+culture+travel+India+temples+forts&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Road Trips India", language: "English", url: "https://news.google.com/rss/search?q=road+trip+travel+India+highway&hl=en-IN&gl=IN&ceid=IN:en" }
+          ]
+        },
+        {
+          title: "South East Asia Travel",
+          injectTip: false,
+          feeds: [
+            { name: "SE Asia Travel News", language: "English", url: "https://news.google.com/rss/search?q=Southeast+Asia+tourism+travel+destinations&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Thailand Travel", language: "English", url: "https://news.google.com/rss/search?q=Thailand+travel+tourism+Bangkok+Phuket&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Vietnam & Cambodia Travel", language: "English", url: "https://news.google.com/rss/search?q=Vietnam+Cambodia+travel+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Bali & Indonesia Travel", language: "English", url: "https://news.google.com/rss/search?q=Bali+Indonesia+travel+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Malaysia Singapore Travel", language: "English", url: "https://news.google.com/rss/search?q=Malaysia+Singapore+travel+tourism&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Philippines & Myanmar Travel", language: "English", url: "https://news.google.com/rss/search?q=Philippines+Myanmar+travel+tourism&hl=en-IN&gl=IN&ceid=IN:en" }
+          ]
+        },
+        {
+          title: "Travel YouTube Channels",
+          injectTip: false,
+          feeds: [
+            { name: "Curly Tales", language: "Hindi/English", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCZm3_5MqwRUBJqFMJgDAAZg", isYoutube: true },
+            { name: "Mumbiker Nikhil", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCv3NhQl1D6upCq-nQOLPWGg", isYoutube: true },
+            { name: "Flying Beast", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCtFjPkAEEpWvdcMRVdEE7Cg", isYoutube: true },
+            { name: "Desi Traveller", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCuJLEx8lyOj7LpsPQ5kJmwA", isYoutube: true },
+            { name: "Travel With AK", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCMWfCqFo_WjIWV_zA6V0SMQ", isYoutube: true },
+            { name: "Solo Travel India", language: "Hindi/English", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCjGq4B8dPrj95kM_6hX9mpA", isYoutube: true }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Shopping",
+      categories: [
+        {
+          title: "Price Tracker & Shop Search",
+          injectTip: false,
+          injectShoppingTools: true,
+          feeds: []
+        },
+        {
+          title: "Shopping & Offers News",
+          injectTip: false,
+          feeds: [
+            { name: "Sale & Festival Offers", language: "English", url: "https://news.google.com/rss/search?q=Amazon+OR+Flipkart+OR+Myntra+sale+offers+India&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Price Drop Alerts", language: "English", url: "https://news.google.com/rss/search?q=price+drop+smartphones+gadgets+India&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Electronics Deals", language: "English", url: "https://news.google.com/rss/search?q=laptop+OR+mobile+OR+headphone+deal+price+India&hl=en-IN&gl=IN&ceid=IN:en" },
+            { name: "Fashion & Lifestyle Deals", language: "English", url: "https://news.google.com/rss/search?q=fashion+clothing+footwear+sale+offer+India&hl=en-IN&gl=IN&ceid=IN:en" }
           ]
         }
       ]
@@ -939,6 +977,80 @@
         sectionEl.appendChild(tipSection);
       }
 
+      if (cat.injectShoppingTools) {
+        const toolsSection = document.createElement('div');
+        toolsSection.className = 'feed-section';
+        toolsSection.innerHTML = `
+          <style>
+            .price-tracker-box {
+              border: 2px solid #000;
+              padding: 16px;
+              margin-bottom: 20px;
+              background: #f5efe1;
+            }
+            .price-tracker-box h3 {
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 10px;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              margin: 0 0 10px;
+            }
+            .price-tracker-box label {
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 11px;
+              font-weight: bold;
+              display: block;
+              margin-bottom: 4px;
+            }
+            .price-tracker-box input {
+              width: 100%;
+              padding: 10px;
+              border: 2px solid #000;
+              font-size: 14px;
+              box-sizing: border-box;
+              margin-bottom: 10px;
+              background: #fff;
+            }
+            .price-tracker-box .btn-row {
+              display: flex;
+              gap: 8px;
+              flex-wrap: wrap;
+            }
+            .price-tracker-box .btn-row button {
+              flex: 1;
+              min-width: 100px;
+              padding: 10px;
+              border: 2px solid #000;
+              font-weight: bold;
+              cursor: pointer;
+              font-size: 12px;
+              text-transform: uppercase;
+              background: #e9c46a;
+              transition: background 0.2s;
+            }
+            .price-tracker-box .btn-row button:hover {
+              filter: brightness(0.9);
+            }
+            .price-tracker-box .btn-row button.amazon-btn { background: #ff9900; color: #000; }
+            .price-tracker-box .btn-row button.flipkart-btn { background: #2874f0; color: #fff; }
+            .price-tracker-box .btn-row button.myntra-btn { background: #f04e98; color: #fff; }
+            .price-tracker-box .btn-row button.history-btn { background: #81b29a; color: #000; }
+          </style>
+          <div class="price-tracker-box">
+            <h3>&#128722; Shopping Tools</h3>
+            <label for="price-tracker-input">Enter product name or paste product URL:</label>
+            <input type="text" id="price-tracker-input" placeholder="e.g. iPhone 15, Samsung TV, or paste Amazon/Flipkart link...">
+            <div class="btn-row">
+              <button class="history-btn" onclick="checkPriceHistory()">&#128200; Track Price</button>
+              <button class="amazon-btn" onclick="searchPortal('amazon')">Amazon</button>
+              <button class="flipkart-btn" onclick="searchPortal('flipkart')">Flipkart</button>
+              <button class="myntra-btn" onclick="searchPortal('myntra')">Myntra</button>
+            </div>
+          </div>
+        `;
+        sectionEl.appendChild(toolsSection);
+      }
+
       cat.feeds.forEach(feed => {
         const feedSection = document.createElement('div');
         feedSection.className = 'feed-section';
@@ -988,6 +1100,9 @@
             }
 
             const unreadItems = data.items.filter(item => !readArticles.includes(item.link));
+            unreadItems.sort(function(a, b) {
+              return new Date(b.pubDate) - new Date(a.pubDate);
+            });
 
             if (unreadItems.length === 0) {
                grid.innerHTML = '<p>You are all caught up! No new articles right now.</p>';
@@ -1117,7 +1232,7 @@
   });
 
   const btnContainer = document.getElementById('section-buttons');
-  const sectionColors = ['#e07a5f', '#81b29a', '#3d5a80', '#d4a373', '#9b5de5', '#e9c46a'];
+  const sectionColors = ['#f0a08a', '#b8d5c6', '#7ba0c4', '#e8cca8', '#d4b0f0', '#f2dca0'];
 
   mainSections.forEach((section, index) => {
     const btn = document.createElement('button');
@@ -1490,6 +1605,66 @@
   });
 
   document.getElementById('reader-scroll').addEventListener('scroll', setReaderProgress);
+</script>
+
+<!-- ══ PWA: Inline Manifest + Service Worker ══ -->
+<script id="sw-src" type="text/plain">
+const CACHE = 'khichdi-v1';
+const OFFLINE_URL = './';
+self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll([OFFLINE_URL]).catch(() => {}))); });
+self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener('fetch', e => { const u = e.request.url; if (e.request.method !== 'GET' || u.startsWith('chrome-extension') || u.startsWith('data:')) return; if (u.includes('allorigins') || u.includes('googleapis') || u.includes('cdnjs') || u.includes('fonts.googleapis') || u.includes('fonts.gstatic')) { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); return; } e.respondWith(caches.match(e.request).then(cached => { if (cached) return cached; return fetch(e.request).then(resp => { if (resp && resp.status === 200 && resp.type !== 'opaque') caches.open(CACHE).then(c => c.put(e.request, resp.clone())); return resp; }).catch(() => caches.match(OFFLINE_URL)); })); });
+</script>
+<script>
+(function() {
+  const manifest = {
+    name: "खिचडी 1B — Recipes · Stories · Videos",
+    short_name: "खिचडी 1B",
+    description: "Marathi recipes, stories, videos and lifestyle — ad-free reader",
+    start_url: "./",
+    display: "standalone",
+    orientation: "portrait-primary",
+    background_color: "#ece0c4",
+    theme_color: "#ece0c4",
+    categories: ["food", "lifestyle", "news"],
+    icons: [{
+      src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%23ece0c4'/%3E%3Ccircle cx='72' cy='96' r='48' fill='%231a1a1a'/%3E%3Ccircle cx='72' cy='94' r='40' fill='%23333'/%3E%3Crect x='112' y='88' width='52' height='10' rx='3' fill='%231a1a1a'/%3E%3Crect x='112' y='90' width='46' height='6' rx='2' fill='%23444'/%3E%3Crect x='158' y='84' width='12' height='18' rx='4' fill='%23111'/%3E%3C/svg%3E",
+      sizes: "192x192", type: "image/svg+xml", purpose: "any maskable"
+    }]
+  };
+  try {
+    const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+    document.getElementById('pwa-manifest-link').href = URL.createObjectURL(blob);
+  } catch(e) { console.warn('Manifest blob failed:', e); }
+
+  if ('serviceWorker' in navigator) {
+    try {
+      const swText = document.getElementById('sw-src').textContent;
+      const b64 = btoa(unescape(encodeURIComponent(swText)));
+      navigator.serviceWorker.register('data:application/javascript;base64,' + b64, { scope: './' })
+        .then(reg => console.log('SW registered', reg.scope))
+        .catch(err => console.info('SW skipped (needs http/https):', err.message));
+    } catch(e) { console.info('SW not available:', e.message); }
+  }
+
+  let deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    setTimeout(function() {
+      var badge = document.createElement('div');
+      badge.id = 'pwa-badge';
+      badge.innerHTML = '<span style="cursor:pointer;position:fixed;bottom:20px;left:16px;z-index:1300;background:#1a1a1a;color:#ece0c4;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 16px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;">⬇ Install खिचडी 1B</span>';
+      badge.onclick = function(e) {
+        if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt = null; badge.remove(); }); }
+      };
+      document.body.appendChild(badge);
+    }, 3000);
+  });
+  window.addEventListener('appinstalled', function() {
+    var b = document.getElementById('pwa-badge'); if (b) b.remove();
+  });
+})();
 </script>
 
 </body>
