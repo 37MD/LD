@@ -994,13 +994,21 @@
   }
 
   function fetchYoutubeFeed(feed, grid, safeId) {
-    var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(feed.url);
-    var fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url);
+    var proxies = [
+      'https://corsproxy.io/?' + encodeURIComponent(feed.url),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(feed.url)
+    ];
 
-    function tryFetch(primary, secondary) {
-      fetch(primary)
+    function tryNext(idx) {
+      if (idx >= proxies.length) {
+        grid.innerHTML = '<p>Failed to load YouTube feed. Try again later.</p>';
+        return;
+      }
+      fetch(proxies[idx])
         .then(function(r) { return r.text(); })
         .then(function(xml) {
+          if (xml.indexOf('parsererror') !== -1 || xml.indexOf('<feed') === -1) throw new Error('Bad XML');
           var items = parseYoutubeXml(xml);
           if (items.length === 0) throw new Error('No items');
           var unread = items.filter(function(item) { return readArticles.indexOf(item.link) === -1; });
@@ -1013,15 +1021,11 @@
           renderFeedBatch(grid, safeId);
         })
         .catch(function() {
-          if (secondary) {
-            tryFetch(secondary, null);
-          } else {
-            grid.innerHTML = '<p>Failed to load YouTube feed. Try again later.</p>';
-          }
+          tryNext(idx + 1);
         });
     }
 
-    tryFetch(proxyUrl, fallbackUrl);
+    tryNext(0);
   }
 
   function getTranslatedLink(link, isYoutube) {
