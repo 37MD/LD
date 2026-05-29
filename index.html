@@ -551,6 +551,26 @@
 
 <script>
   // ==========================================
+  // LANDSCAPE/FULLSCREEN HANDLER
+  // ==========================================
+  function makeLandscape() {
+    var videoEl = document.querySelector('.reader-video-embed');
+    if (videoEl) {
+      if (videoEl.requestFullscreen) {
+        videoEl.requestFullscreen().then(function() {
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(function(e) { console.log(e); });
+          }
+        }).catch(function(e) { console.log(e); });
+      } else if (videoEl.webkitRequestFullscreen) {
+        videoEl.webkitRequestFullscreen();
+      } else if (videoEl.msRequestFullscreen) {
+        videoEl.msRequestFullscreen();
+      }
+    }
+  }
+
+  // ==========================================
   // TRAVEL DISCOVERY LOGIC
   // ==========================================
   function searchTravel(type) {
@@ -1312,7 +1332,7 @@
     });
   }
 
-  // UPDATED: Extremely robust regex that catches almost any variation of a YouTube URL
+  // Extremely robust regex that catches almost any variation of a YouTube URL
   function getYoutubeVideoId(url) {
     if (!url) return null;
     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|live\/|watch\?v=|\&v=)([^#\&\?]*).*/;
@@ -1338,20 +1358,20 @@
       document.getElementById('reader-font-dec').style.display = 'none';
       document.getElementById('reader-font-inc').style.display = 'none';
       
-      // UPDATED: Reverted to standard youtube.com, added playsinline=1, and added a robust fallback button
       var embedHtml = '<div class="reader-video-wrap">';
       if (vid) {
         embedHtml += '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
       } else {
-        embedHtml += '<div style="width:100%; height:100%; position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; background:#000; color:#fff; font-family:\'IBM Plex Mono\', monospace; font-size:12px;">Video preview not available</div>';
+        embedHtml += '<div style="width:100%; height:100%; position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; background:#e0e1dd; color:#000000; font-family:\'IBM Plex Mono\', monospace; font-size:12px; border:2px solid #000000; box-sizing:border-box;">Video preview not available</div>';
       }
       embedHtml += '</div>';
 
       embedHtml += '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
       
-      // Prominent fallback button in case the video creator blocked embeds
+      // Added Landscape Button + Fallback Button
       embedHtml += '<div style="text-align:center; padding: 25px 20px;">' +
-                   '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer;">&#9654; Open in YouTube App</button>' +
+                   '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
+                   '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
                    '<p style="font-size:12px; margin-top:12px; color:#000000;">(Tap above if the video owner disabled embedded playback)</p>' +
                    '</div>';
 
@@ -1367,14 +1387,17 @@
       var chId = url.slice(10);
       var channelUrl = 'https://www.youtube.com/channel/' + chId;
       extLink.onclick = function() { window.open(channelUrl, '_blank'); };
-      document.getElementById('reader-content').innerHTML =
-        '<div class="reader-video-wrap">' +
+      
+      var embedHtml = '<div class="reader-video-wrap">' +
           '<iframe class="reader-video-embed" src="https://www.youtube.com/embed?listType=user_uploads&list=' + chId + '&rel=0&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
         '</div>' +
         '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>' +
         '<div style="text-align:center; padding: 25px 20px;">' +
-           '<button onclick="window.open(\'' + channelUrl + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer;">&#9654; Open in YouTube App</button>' +
+           '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
+           '<button onclick="window.open(\'' + channelUrl + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
         '</div>';
+        
+      document.getElementById('reader-content').innerHTML = embedHtml;
       var scrollEl = document.getElementById('reader-scroll');
       scrollEl.scrollTop = 0;
       return;
