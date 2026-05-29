@@ -917,15 +917,31 @@
         sectionEl.appendChild(feedSection);
         const grid = document.getElementById(safeId);
 
+        if (feed.isYoutube) {
+          var chMatch = feed.url.match(/channel_id=([a-zA-Z0-9_-]+)/);
+          var channelId = chMatch ? chMatch[1] : '';
+          grid.innerHTML = '';
+          if (!channelId) {
+            grid.innerHTML = '<p>Invalid channel.</p>';
+            return;
+          }
+          var channelCard = document.createElement('div');
+          channelCard.className = 'feed-item';
+          var safeName = feed.name.replace(/"/g, '&quot;');
+          channelCard.innerHTML =
+            '<span class="headline reader-trigger" data-url="ytchannel:' + channelId + '" data-title="' + safeName + '" data-feed="YouTube" data-date="">' + feed.name + '</span>' +
+            '<p class="description">Click to watch the latest videos from ' + feed.name + '</p>' +
+            '<div class="meta"><span>' + feed.language + '</span></div>';
+          grid.appendChild(channelCard);
+          return;
+        }
+
         fetch(rss2jsonUrl + encodeURIComponent(feed.url))
           .then(response => response.json())
           .then(data => {
             grid.innerHTML = '';
 
             if (data.status !== 'ok') {
-              if (feed.isYoutube) {
-                return fetchYoutubeFeed(feed, grid, safeId);
-              }
               grid.innerHTML = '<p>Failed to load feed. The publisher may have restricted access.</p>';
               return;
             }
@@ -941,91 +957,10 @@
             renderFeedBatch(grid, safeId);
           })
           .catch(error => {
-            if (feed.isYoutube) {
-              fetchYoutubeFeed(feed, grid, safeId);
-            } else {
-              grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
-            }
+            grid.innerHTML = '<p>Error fetching data. Check your network connection.</p>';
           });
       });
     });
-  }
-
-  function parseYoutubeXml(xmlText) {
-    var doc = new DOMParser().parseFromString(xmlText, 'text/xml');
-    var entries = doc.getElementsByTagName('entry');
-    var items = [];
-    for (var ei = 0; ei < entries.length; ei++) {
-      var entry = entries[ei];
-      var title = '';
-      var t = entry.getElementsByTagName('title');
-      if (t.length) title = t[0].textContent || '';
-      var link = '';
-      var l = entry.getElementsByTagName('link');
-      for (var li = 0; li < l.length; li++) {
-        if (l[li].getAttribute('rel') === 'alternate') {
-          link = l[li].getAttribute('href') || '';
-          break;
-        }
-      }
-      var pubDate = '';
-      var p = entry.getElementsByTagName('published');
-      if (p.length) pubDate = p[0].textContent || '';
-      var vid = entry.getElementsByTagName('videoId');
-      var videoId = vid.length ? (vid[0].textContent || '') : '';
-      var desc = '';
-      var d = entry.getElementsByTagName('description');
-      if (d.length) desc = d[0].textContent || '';
-      if (!desc) {
-        var thumb = entry.getElementsByTagName('thumbnail');
-        if (thumb.length) desc = 'YouTube video';
-      }
-      if (title && link) {
-        items.push({
-          title: title,
-          link: link,
-          pubDate: pubDate,
-          description: desc,
-          videoId: videoId
-        });
-      }
-    }
-    return items;
-  }
-
-  function fetchYoutubeFeed(feed, grid, safeId) {
-    var proxies = [
-      'https://corsproxy.io/?' + encodeURIComponent(feed.url),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(feed.url),
-      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(feed.url)
-    ];
-
-    function tryNext(idx) {
-      if (idx >= proxies.length) {
-        grid.innerHTML = '<p>Failed to load YouTube feed. Try again later.</p>';
-        return;
-      }
-      fetch(proxies[idx])
-        .then(function(r) { return r.text(); })
-        .then(function(xml) {
-          if (xml.indexOf('parsererror') !== -1 || xml.indexOf('<feed') === -1) throw new Error('Bad XML');
-          var items = parseYoutubeXml(xml);
-          if (items.length === 0) throw new Error('No items');
-          var unread = items.filter(function(item) { return readArticles.indexOf(item.link) === -1; });
-          grid.innerHTML = '';
-          if (unread.length === 0) {
-            grid.innerHTML = '<p>You are all caught up! No new videos right now.</p>';
-            return;
-          }
-          feedPageState[safeId] = { items: unread, displayed: 0, feed: feed };
-          renderFeedBatch(grid, safeId);
-        })
-        .catch(function() {
-          tryNext(idx + 1);
-        });
-    }
-
-    tryNext(0);
   }
 
   function getTranslatedLink(link, isYoutube) {
@@ -1272,6 +1207,23 @@
       document.getElementById('reader-content').innerHTML =
         '<div class="reader-video-wrap">' +
           '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&modestbranding=1&iv_load_policy=3&autoplay=1" allowfullscreen></iframe>' +
+        '</div>' +
+        '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
+      var scrollEl = document.getElementById('reader-scroll');
+      scrollEl.scrollTop = 0;
+      return;
+    }
+
+    if (url.indexOf('ytchannel:') === 0) {
+      document.getElementById('reader-font-dec').style.display = 'none';
+      document.getElementById('reader-font-inc').style.display = 'none';
+      var chId = url.slice(10);
+      var plId = 'UU' + chId.slice(2);
+      var channelUrl = 'https://www.youtube.com/channel/' + chId;
+      extLink.onclick = function() { window.open(channelUrl, '_blank'); };
+      document.getElementById('reader-content').innerHTML =
+        '<div class="reader-video-wrap">' +
+          '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/videoseries?list=' + plId + '&rel=0&modestbranding=1&iv_load_policy=3" allowfullscreen></iframe>' +
         '</div>' +
         '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
       var scrollEl = document.getElementById('reader-scroll');
