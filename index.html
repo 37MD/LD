@@ -350,12 +350,13 @@
     gap: 12px;
   }
   .reader-back-btn {
-    background: none;
+    background: #e9c46a;
     border: 2px solid #000;
-    font-size: 1.2em;
+    font-size: 14px;
     cursor: pointer;
-    padding: 4px 10px;
+    padding: 6px 12px;
     font-weight: bold;
+    text-transform: uppercase;
   }
   .reader-source-label {
     font-family: 'IBM Plex Mono', monospace;
@@ -365,6 +366,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    text-align: right;
   }
   .reader-font-controls {
     display: flex;
@@ -533,13 +535,12 @@
 <div id="reader-backdrop"></div>
 <div id="reader-panel">
   <div class="reader-topbar">
-    <button class="reader-back-btn" id="reader-close-btn">&larr;</button>
-    <span class="reader-source-label" id="reader-source">Source</span>
+    <button class="reader-back-btn" id="reader-close-btn">&larr; BACK TO FEED</button>
     <div class="reader-font-controls">
       <button class="reader-font-btn" id="reader-font-dec">A&minus;</button>
       <button class="reader-font-btn" id="reader-font-inc">A+</button>
     </div>
-    <button class="reader-ext-link" id="reader-ext-link">&#8599; Original site</button>
+    <span class="reader-source-label" id="reader-source">Source</span>
   </div>
   <div class="reader-progress" id="reader-progress"></div>
   <div class="reader-scroll" id="reader-scroll">
@@ -1474,11 +1475,19 @@
   document.getElementById('reset-btn').addEventListener('click', resetHistory);
 
   // ==========================================
-  // ARTICLE READER PANEL
+  // ARTICLE READER & HARDWARE BACK PANEL
   // ==========================================
   const READER_TIMEOUT_MS = 5000;
   let _readerArticleUrl = '';
   let _readerFontSize = 17;
+
+  // Handle hardware swipe back / back button 
+  window.addEventListener('popstate', function(e) {
+    var panel = document.getElementById('reader-panel');
+    if (panel.classList.contains('open')) {
+      closeReader(true); // Close but don't double trigger history.back()
+    }
+  });
 
   function escapeHtml(str) {
     const d = document.createElement('div');
@@ -1519,13 +1528,25 @@
     document.getElementById('reader-progress').style.width = '0%';
     document.body.style.overflow = 'hidden';
 
+    // Push hardware back button state
+    if (!history.state || !history.state.readerOpen) {
+      history.pushState({readerOpen: true}, '');
+    }
+
     var vid = getYoutubeVideoId(url);
 
     if (vid || isYoutube) {
       document.getElementById('reader-font-dec').style.display = 'none';
       document.getElementById('reader-font-inc').style.display = 'none';
       
-      var embedHtml = '<div class="reader-video-wrap">';
+      let embedHtml = '';
+      
+      // Extremely obvious BACK button placed directly ABOVE the video
+      embedHtml += '<div style="text-align:center; padding: 15px 20px 5px;">' +
+                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:14px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">&larr; Close Video & Back to Feed</button>' +
+                   '</div>';
+
+      embedHtml += '<div class="reader-video-wrap">';
       if (vid) {
         embedHtml += '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
       } else {
@@ -1535,9 +1556,7 @@
 
       embedHtml += '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>';
       
-      // Added Back Button + Landscape Button + Fallback Button
       embedHtml += '<div style="text-align:center; padding: 25px 20px;">' +
-                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
                    '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
                    '<button onclick="window.open(\'' + url + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
                    '<p style="font-size:12px; margin-top:12px; color:#000000;">(Tap above if the video owner disabled embedded playback)</p>' +
@@ -1556,12 +1575,16 @@
       var channelUrl = 'https://www.youtube.com/channel/' + chId;
       extLink.onclick = function() { window.open(channelUrl, '_blank'); };
       
-      var embedHtml = '<div class="reader-video-wrap">' +
+      let embedHtml = '';
+      embedHtml += '<div style="text-align:center; padding: 15px 20px 5px;">' +
+                   '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:14px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">&larr; Close Video & Back to Feed</button>' +
+                   '</div>';
+
+      embedHtml += '<div class="reader-video-wrap">' +
           '<iframe class="reader-video-embed" src="https://www.youtube.com/embed?listType=user_uploads&list=' + chId + '&rel=0&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>' +
         '</div>' +
         '<h1 class="reader-article-title" style="padding:15px 20px 0">' + escapeHtml(title) + '</h1>' +
         '<div style="text-align:center; padding: 25px 20px;">' +
-           '<button onclick="closeReader()" style="background:#e9c46a; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&larr; Back to Feed</button><br>' +
            '<button onclick="makeLandscape()" style="background:#a8dadc; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%; margin-bottom:15px;">&#10521; View in Landscape (Fullscreen)</button><br>' +
            '<button onclick="window.open(\'' + channelUrl + '\', \'_blank\')" style="background:#e07a5f; color:#000000; border:2px solid #000000; padding:12px 20px; font-weight:bold; font-size:16px; cursor:pointer; width:100%;">&#9654; Open in YouTube App</button>' +
         '</div>';
@@ -1578,13 +1601,21 @@
     fetchArticleLocal(url, title, feedName, pubDate);
   }
 
-  function closeReader() {
+  function closeReader(isPopState) {
     var backdrop = document.getElementById('reader-backdrop');
     var panel = document.getElementById('reader-panel');
     backdrop.classList.remove('active');
     panel.classList.remove('open');
     document.body.style.overflow = '';
     _readerArticleUrl = '';
+    
+    // Crucial: Destroy the inner HTML so video background audio stops playing immediately
+    document.getElementById('reader-content').innerHTML = '<div class="reader-status">Select an article to read</div>';
+    
+    // If closed manually via on-screen button, remove the hardware back history state
+    if (isPopState !== true && history.state && history.state.readerOpen) {
+      history.back();
+    }
   }
 
   function fetchArticleLocal(url, title, feedName, pubDate) {
