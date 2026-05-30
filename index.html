@@ -763,7 +763,7 @@
         cleanItems.forEach(item => {
           const safeTitle = item.title.replace(/"/g, '&quot;');
           html += '<div class="feed-item" style="margin-bottom: 15px; padding-bottom: 15px;">' +
-              '<span class="headline reader-trigger" data-url="' + item.link + '" data-title="' + safeTitle + '" data-feed="' + data.feed.title + '" data-date="' + item.pubDate + '" data-isyoutube="true">' + item.title + '</span>' +
+              '<span class="headline reader-trigger" data-url="' + item.link.replace(/"/g, '&quot;') + '" data-title="' + safeTitle + '" data-feed="' + data.feed.title + '" data-date="' + item.pubDate + '" data-isyoutube="true">' + item.title + '</span>' +
               '<div class="meta" style="margin-top:8px;">' +
                 '<span>' + new Date(item.pubDate).toLocaleDateString() + '</span>' +
               '</div>' +
@@ -993,14 +993,16 @@
       feedItem.className = 'feed-item';
       
       const safeTitle = article.title.replace(/"/g, '&quot;');
+      const escapedLink = article.link.replace(/"/g, '&quot;');
+      const transLink = getTranslatedLink(article.link, false).replace(/"/g, '&quot;');
       feedItem.innerHTML = `
-        <span class="headline reader-trigger" data-url="${article.link}" data-title="${safeTitle}" data-feed="Saved" data-date="">${article.title}</span>
+        <span class="headline reader-trigger" data-url="${escapedLink}" data-title="${safeTitle}" data-feed="Saved" data-date="">${article.title}</span>
         <p class="description">${article.summary}</p>
         <div class="meta">
           <span></span>
           <span>
-            <button class="view-orig-btn" onclick="window.open('${getTranslatedLink(article.link, false)}','_blank')">↗ Original site</button>
-            <button class="view-orig-btn btn-unsave" data-link="${article.link}" style="margin-left:12px;">Remove</button>
+            <button class="view-orig-btn" data-href="${transLink}">↗ Original site</button>
+            <button class="view-orig-btn btn-unsave" data-link="${escapedLink}" style="margin-left:12px;">Remove</button>
           </span>
         </div>
       `;
@@ -1011,6 +1013,10 @@
   document.addEventListener('click', (e) => {
     if (e.target.matches('.btn-unsave')) {
        unsaveArticle(e.target.getAttribute('data-link'));
+    }
+    if (e.target.matches('.view-orig-btn') && !e.target.matches('.btn-unsave')) {
+      var href = e.target.getAttribute('data-href');
+      if (href) window.open(href, '_blank');
     }
   });
 
@@ -1649,12 +1655,14 @@
       feedItem.setAttribute('data-link', item.link);
       var safeTitle = item.title.replace(/"/g, '&quot;');
       var ytAttr = feed.isYoutube ? ' data-isyoutube="true"' : '';
+      var escapedLink = item.link.replace(/"/g, '&quot;');
+      var transLink = getTranslatedLink(item.link, feed.isYoutube).replace(/"/g, '&quot;');
       feedItem.innerHTML =
-        '<span class="headline reader-trigger" data-url="' + item.link + '" data-title="' + safeTitle + '" data-feed="' + feed.name + '" data-date="' + (item.pubDate || '') + '"' + ytAttr + '>' + item.title + '</span>' +
+        '<span class="headline reader-trigger" data-url="' + escapedLink + '" data-title="' + safeTitle + '" data-feed="' + feed.name + '" data-date="' + (item.pubDate || '') + '"' + ytAttr + '>' + item.title + '</span>' +
         '<p class="description">' + summary + '</p>' +
         '<div class="meta">' +
           '<span>' + timeAgo + ' — ' + feed.name + '</span>' +
-          '<button class="view-orig-btn" onclick="window.open(\'' + getTranslatedLink(item.link, feed.isYoutube) + '\',\'_blank\')">↗ Original site</button>' +
+          '<button class="view-orig-btn" data-href="' + transLink + '">↗ Original site</button>' +
         '</div>';
       frag.appendChild(feedItem);
     });
