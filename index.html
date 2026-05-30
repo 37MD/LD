@@ -1643,15 +1643,17 @@
     return inst.embedBase + vid + params;
   }
 
-  function renderYtPlayer(vid) {
+  function renderYtPlayer(vid, url) {
     var src = getYtPlayerSrc(vid);
-    return '<div class="reader-video-wrap">' +
+    var safeUrl = url.replace(/"/g, '&quot;');
+    return '<div class="reader-video-wrap" style="position:relative;">' +
         '<iframe class="reader-video-embed" src="' + src + '"' +
         ' frameborder="0"' +
         ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
         ' allowfullscreen' +
         ' referrerpolicy="no-referrer">' +
         '</iframe>' +
+        '<a href="' + safeUrl + '" target="_blank" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;opacity:0;" title="Open in YouTube if video fails to play"></a>' +
       '</div>';
   }
 
@@ -1902,7 +1904,7 @@
 
       var embedHtml;
       if (vid) {
-        embedHtml = renderYtPlayer(vid);
+        embedHtml = renderYtPlayer(vid, url);
       } else {
         embedHtml =
           '<div style="padding:40px 20px; text-align:center; font-family:\'IBM Plex Mono\',monospace; font-size:12px;">Video preview not available.</div>' +
