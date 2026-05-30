@@ -95,15 +95,6 @@
     font-size: 0.9em;
     cursor: pointer;
   }
-  .masthead-controls #yt-player-select {
-    background: #a8dadc;
-    border: 2px solid #000;
-    padding: 6px 8px;
-    font-weight: bold;
-    font-size: 0.8em;
-    cursor: pointer;
-    max-width: 110px;
-  }
   .masthead-controls .reset-small-btn {
     background: #d4a373;
     border: 2px solid #000;
@@ -628,25 +619,6 @@
     opacity: 0.6;
   }
 
-  /* ===== VIDEO FLOAT BACK BUTTON ===== */
-  #video-float-back {
-    display: none;
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1100;
-    background: #e9c46a;
-    color: #000;
-    border: 2px solid #000;
-    padding: 12px 28px;
-    font-weight: bold;
-    font-size: 1em;
-    cursor: pointer;
-    border-radius: 30px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.5);
-    white-space: nowrap;
-  }
 </style>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </head>
@@ -661,11 +633,6 @@
         <option value="marathi">Marathi</option>
         <option value="hindi">Hindi</option>
         <option value="english">English</option>
-      </select>
-      <select id="yt-player-select">
-        <option value="youtube">YouTube</option>
-        <option value="invidious">Invidious</option>
-        <option value="piped">Piped</option>
       </select>
       <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
     </div>
@@ -686,7 +653,6 @@
 </div>
 
 <div id="reader-backdrop"></div>
-<button id="video-float-back" onclick="closeReader()">&#8592; Back to Feed</button>
 <div id="reader-panel">
   <div class="reader-topbar">
     <button class="reader-back-btn" id="reader-close-btn">&larr;</button>
@@ -1619,42 +1585,6 @@
     return 'https://translate.google.com/translate?sl=auto&tl=' + tl + '&u=' + encodeURIComponent(link);
   }
 
-  // ==========================================
-  // YOUTUBE PLAYER SELECTOR
-  // ==========================================
-  var YT_PLAYER_INSTANCES = {
-    youtube:   { name: 'YouTube',        embedBase: 'https://www.youtube.com/embed/' },
-    invidious: { name: 'Invidious',      embedBase: 'https://yt.cdaut.de/embed/' },
-    piped:     { name: 'Piped',          embedBase: 'https://piped.video/embed/' }
-  };
-
-  var _ytPlayerPref = localStorage.getItem('khichdi_yt_player') || 'youtube';
-
-  function setYtPlayer(playerId) {
-    _ytPlayerPref = playerId;
-    localStorage.setItem('khichdi_yt_player', playerId);
-  }
-
-  function getYtPlayerSrc(vid) {
-    var inst = YT_PLAYER_INSTANCES[_ytPlayerPref] || YT_PLAYER_INSTANCES.youtube;
-    var params = _ytPlayerPref === 'youtube'
-      ? '?rel=0&playsinline=1'
-      : '?rel=0&autoplay=1&playsinline=1&controls=0&iv_load_policy=3&modestbranding=1&disablekb=1';
-    return inst.embedBase + vid + params;
-  }
-
-  function renderYtPlayer(vid) {
-    var src = getYtPlayerSrc(vid);
-    return '<div class="reader-video-wrap">' +
-        '<iframe class="reader-video-embed" src="' + src + '"' +
-        ' frameborder="0"' +
-        ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
-        ' allowfullscreen' +
-        ' referrerpolicy="no-referrer">' +
-        '</iframe>' +
-      '</div>';
-  }
-
   function renderFeedBatch(grid, stateKey) {
     var state = feedPageState[stateKey];
     if (!state) return;
@@ -1833,15 +1763,6 @@
     }
   });
 
-  (function() {
-    var sel = document.getElementById('yt-player-select');
-    var saved = localStorage.getItem('khichdi_yt_player') || 'youtube';
-    sel.value = saved;
-    sel.addEventListener('change', function() {
-      setYtPlayer(this.value);
-    });
-  })();
-
   document.getElementById('reset-btn').addEventListener('click', resetHistory);
 
   // ==========================================
@@ -1898,7 +1819,7 @@
 
       var embedHtml = '<div class="reader-video-wrap">';
       if (vid) {
-        embedHtml += '<iframe class="reader-video-embed" src="' + getYtPlayerSrc(vid) + '" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+        embedHtml += '<iframe class="reader-video-embed" src="https://www.youtube.com/embed/' + vid + '?rel=0&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
       } else {
         embedHtml += '<div style="width:100%; height:100%; position:absolute; top:0; left:0; display:flex; align-items:center; justify-content:center; background:#e0e1dd; color:#000000; font-family:\'IBM Plex Mono\', monospace; font-size:12px; border:2px solid #000000; box-sizing:border-box;">Video preview not available</div>';
       }
@@ -1949,11 +1870,6 @@
   }
 
   function closeReader() {
-    document.getElementById('video-float-back').style.display = 'none';
-    var topbar = document.querySelector('.reader-topbar');
-    if (topbar) topbar.style.display = '';
-    document.getElementById('reader-progress').style.display = '';
-    document.getElementById('reader-scroll').style.padding = '';
     var backdrop = document.getElementById('reader-backdrop');
     var panel = document.getElementById('reader-panel');
     backdrop.classList.remove('active');
