@@ -1616,53 +1616,91 @@
   function runQcSearch(input) {
     var el = document.getElementById('qc-results');
     var locStr = getLocationStr();
-    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading"><span class="spinner">⟳</span> Searching Blinkit, Zepto, Instamart, BigBasket, Amazon Now, DMart & Flipkart Minutes...</p>';
-
     var startTime = Date.now();
     var allResults = [];
     var completed = 0;
-    var blinkitDone = false;
-    var bestName = '';  // best product name from Blinkit for cross-platform links
+    var total = QC_PARSE_PLATFORMS.length;
+
+    // Show skeleton immediately — price table loading + redirect buttons already visible
+    el.innerHTML = buildQcSkeleton(input, locStr);
 
     function collect(platform, results) {
       if (results && results.length > 0) {
         results.forEach(function(r) { r.platform = platform; });
         allResults = allResults.concat(results);
-        // Save first Blinkit result name+qty as a refined search term
-        if (platform === 'blinkit' && results.length > 0 && !bestName) {
-          var r0 = results[0];
-          bestName = r0.name + (r0.qty ? ' ' + r0.qty : '');
-        }
-      } else {
-        var pf = QC_PLATFORMS.filter(function(p) { return p.id === platform; })[0];
-        if (pf) {
-          // ALWAYS use the clean product name (input), never a URL or uncertain bestName
-          var linkQ = input;
-          allResults.push({ merchant: pf.name, price: null, mrp: null, name: null, url: pf.url + encodeURIComponent(linkQ), platform: platform, linkOnly: true });
-        }
       }
-      if (platform === 'blinkit') blinkitDone = true;
       completed++;
-      // Show Blinkit results immediately, then update as others come in
-      if (completed >= QC_PLATFORMS.length || (blinkitDone && completed >= 2)) {
+      if (completed >= total) {
         allResults.sort(function(a, b) {
           if (a.price === null && b.price === null) return 0;
           if (a.price === null) return 1;
           if (b.price === null) return -1;
           return a.price - b.price;
         });
-        renderQcResults(allResults, input, startTime);
+        renderQcPriceTable(allResults, input, startTime);
       }
     }
 
+    // TIER 1 only — fetch prices via Jina
     searchBlinkit(input, function(r) { collect('blinkit', r); });
-    searchZepto(input, function(r) { collect('zepto', r); });
-    searchInstamart(input, function(r) { collect('instamart', r); });
-    searchBigBasket(input, function(r) { collect('bigbasket', r); });
-    searchAmazonNow(input, function(r) { collect('amazonnow', r); });
-    searchDmart(input, function(r) { collect('dmart', r); });
     searchFlipkartMinutes(input, function(r) { collect('flipkartminutes', r); });
-    searchJioMart(input, function(r) { collect('jiomart', r); });
+    searchAmazonNow(input, function(r) { collect('amazonnow', r); });
+  }
+
+  function buildQcSkeleton(input, locStr) {
+    var html =
+      '<div class="compare-product-info"><div class="label">🔍 Product</div>' +
+      '<div class="value">' + input + '</div>' +
+      '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div>';
+
+    // Price table loading area
+    html += '<div id="qc-price-table"><p class="loading"><span class="spinner">⟳</span> Fetching prices from Blinkit · Flipkart Minutes · Amazon Now...</p></div>';
+
+    // Redirect buttons — shown immediately, no waiting
+    html += '<div style="margin-top:16px;border:2px solid #000;padding:12px;background:#f5efe1;">';
+    html += '<div style="font-family:monospace;font-size:10px;font-weight:bold;text-transform:uppercase;margin-bottom:10px;opacity:0.6;">🔗 Open in App — Product Name Pre-filled</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    QC_REDIRECT_PLATFORMS.forEach(function(p) {
+      html += '<a href="' + p.url(input) + '" target="_blank" ' +
+        'style="display:flex;align-items:center;justify-content:center;gap:6px;' +
+        'padding:12px 8px;background:' + p.color + ';color:' + p.textColor + ';' +
+        'border:2px solid #000;font-weight:bold;font-size:13px;text-decoration:none;text-align:center;">' +
+        p.emoji + ' ' + p.name + '</a>';
+    });
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderQcPriceTable(results, query, startTime) {
+    var el = document.getElementById('qc-price-table');
+    if (!el) return;
+    var elapsed = ' (' + ((Date.now() - startTime) / 1000).toFixed(1) + 's)';
+    var hasPrices = results.some(function(r) { return r.price !== null; });
+
+    if (!hasPrices) {
+      el.innerHTML = '<div style="text-align:center;padding:16px;font-family:monospace;font-size:12px;border:2px dashed #000;margin-bottom:8px;">No prices found on Blinkit · Flipkart Minutes · Amazon Now<br>Use the buttons below to search directly.</div>';
+      return;
+    }
+
+    var html = '<table class="compare-table">';
+    html += '<thead><tr><th>Product</th><th>Qty</th><th>Store</th><th>Price</th></tr></thead><tbody>';
+
+    results.forEach(function(r) {
+      var isLowest = r.price === results[0].price;
+      var qty = r.qty || extractQty(r.name || '');
+      var discount = (r.mrp && r.mrp > r.price) ? ' <span style="color:#2a9d8f;font-size:10px;">' + Math.round((1 - r.price / r.mrp) * 100) + '% off</span>' : '';
+      html += '<tr class="' + (isLowest ? 'lowest' : '') + '">';
+      html += '<td style="font-size:12px;"><a href="' + r.url + '" target="_blank" style="text-decoration:underline;">' +
+        (r.name || query).replace(/\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?)|\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc)\s*/gi, '').substring(0, 48) + '</a></td>';
+      html += '<td style="font-size:12px;text-align:center;white-space:nowrap;">' + (qty || '—') + '</td>';
+      html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + '</td>';
+      html += '<td><strong>₹' + r.price.toLocaleString('en-IN') + '</strong>' + discount + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    html += '<div style="font-family:monospace;font-size:10px;opacity:0.5;text-align:right;margin-top:4px;">' + elapsed.trim() + '</div>';
+    el.innerHTML = html;
   }
 
   function searchBlinkit(query, callback) {
