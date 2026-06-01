@@ -8,8 +8,8 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="खिचडी 1L">
-<meta name="application-name" content="खिचडी 1L">
+<meta name="apple-mobile-web-app-title" content="खिचडी 1N">
+<meta name="application-name" content="खिचडी 1N">
 <meta name="description" content="Marathi recipes, stories, videos and lifestyle — ad-free reader">
 <link rel="manifest" href="#" id="pwa-manifest-link">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%23ece0c4'/%3E%3Cpath d='M30 110 L110 110 C115 110 118 135 105 135 L45 135 C30 135 25 110 30 110 Z' fill='%231a1a1a'/%3E%3Cpath d='M105 115 Q145 110 165 105 A5 5 0 0 1 165 115 Q145 120 105 125 Z' fill='%231a1a1a'/%3E%3Cpath d='M60 90 C45 75 75 60 55 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M80 90 C65 75 95 60 75 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M100 90 C85 75 115 60 95 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -519,17 +519,20 @@
   }
   .shop-tab-bar button {
     flex: 1;
-    padding: 10px 4px;
+    padding: 7px 2px;
     border: none;
     border-right: 2px solid #000;
     border-bottom: 2px solid #000;
     background: #e0e1dd;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 16px;
+    font-size: 9px;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
+    line-height: 1.4;
+    word-break: break-word;
+    text-align: center;
   }
   .shop-tab-bar button:last-child { border-right: none; }
   .shop-tab-bar button.active-tab { background: #e9c46a; border-bottom: 3px solid #000; }
@@ -721,7 +724,7 @@
       </select>
       <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
     </div>
-    <div class="masthead-tagline">खिचडी 1L</div>
+    <div class="masthead-tagline">खिचडी 1N</div>
     <div class="masthead-title">खिचडी<span class="pan-icon"><svg viewBox="0 0 192 192"><path d="M30 110 L110 110 C115 110 118 135 105 135 L45 135 C30 135 25 110 30 110 Z" fill="#1a1a1a"/><path d="M105 115 Q145 110 165 105 A5 5 0 0 1 165 115 Q145 120 105 125 Z" fill="#1a1a1a"/><path d="M60 90 C45 75 75 60 55 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/><path d="M80 90 C65 75 95 60 75 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/><path d="M100 90 C85 75 115 60 95 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/></svg></span></div>
     <div class="masthead-tagline">Recipes · Stories · Videos · YouTube</div>
   </div>
@@ -903,7 +906,7 @@
       meesho:   'https://www.meesho.com/search?q=' + encoded,
       nykaa:    'https://www.nykaa.com/search/result/?q=' + encoded,
       instamart: 'https://www.swiggy.com/instamart/search?query=' + encoded,
-      dmart:    'https://www.dmart.in/search?q=' + encoded,
+      dmart:    'https://www.dmart.in/search?q=' + encoded + '&searchParam=k',
     };
     window.open(urls[portal] || urls.amazon, '_blank');
   }
@@ -944,13 +947,14 @@
     var urls = {
       amazon:    'https://www.amazon.in/s?k=' + enc,
       flipkart:  'https://www.flipkart.com/search?q=' + enc,
-      myntra:    'https://www.myntra.com/search?q=' + enc,
+      myntra:    'https://www.myntra.com/' + enc,
       meesho:    'https://www.meesho.com/search?q=' + enc,
       nykaa:     'https://www.nykaa.com/search/result/?q=' + enc,
-      instamart: 'https://www.swiggy.com/instamart/search?query=' + enc,
-      dmart:     'https://www.dmart.in/search?q=' + enc,
-
-      google:    'https://www.google.com/search?tbm=shop&q=' + enc,
+      instamart:   'https://www.swiggy.com/instamart/search?query=' + enc,
+      dmart:       'https://www.dmart.in/search?q=' + enc + '&searchParam=k',
+      flipkartmin: 'https://www.flipkart.com/search?q=' + enc,
+      amazonfresh: 'https://www.amazon.in/s?k=' + enc + '&i=amazonfresh',
+      google:      'https://www.google.com/search?tbm=shop&q=' + enc,
     };
     window.open(urls[portal], '_blank');
   }
@@ -967,6 +971,29 @@
   function setShopCategory(cat) {
     document.getElementById('shop-q').value = cat;
     document.getElementById('shop-q').focus();
+  }
+
+  function setQcCategory(cat) {
+    var el = document.getElementById('qc-input');
+    if (el) { el.value = cat; el.focus(); }
+  }
+
+  function openAllQcom() {
+    var q = document.getElementById('qc-input') ? document.getElementById('qc-input').value.trim() : '';
+    if (!q) { alert('Enter a product name first.'); return; }
+    var enc = encodeURIComponent(q);
+    var platforms = [
+      'https://blinkit.com/s/?q=' + enc,
+      'https://www.zepto.com/search?query=' + enc,
+      'https://www.swiggy.com/instamart/search?query=' + enc,
+      'https://www.bigbasket.com/ps/?q=' + enc,
+      'https://www.amazon.in/s?k=' + enc,
+      'https://www.dmart.in/search?q=' + enc + '&searchParam=k',
+      'https://www.flipkart.com/search?q=' + enc
+    ];
+    platforms.forEach(function(url, i) {
+      setTimeout(function() { window.open(url, '_blank'); }, i * 300);
+    });
   }
 
   // ==========================================
@@ -1509,7 +1536,8 @@
     { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/ps/?q=' },
     { id: 'amazonfresh', name: 'Amazon Fresh', url: 'https://www.amazon.in/s?k=' },
     { id: 'dmart', name: 'DMart', url: 'https://www.dmart.in/search?q=' },
-    { id: 'flipkartminutes', name: 'Flipkart Minutes', url: 'https://www.flipkart.com/search?q=' }
+    { id: 'flipkartminutes', name: 'Flipkart Minutes', url: 'https://www.flipkart.com/search?q=' },
+    { id: 'jiomart', name: 'JioMart', url: 'https://www.jiomart.com/search/' }
   ];
 
   function searchQuickCommerce() {
@@ -1580,6 +1608,7 @@
     searchAmazonFresh(input, function(r) { collect('amazonfresh', r); });
     searchDmart(input, function(r) { collect('dmart', r); });
     searchFlipkartMinutes(input, function(r) { collect('flipkartminutes', r); });
+    searchJioMart(input, function(r) { collect('jiomart', r); });
   }
 
   function searchBlinkit(query, callback) {
@@ -1743,15 +1772,147 @@
   }
 
   function searchAmazonFresh(query, callback) {
-    callback([]);
+    var jinaUrl = 'https://r.jina.ai/https://www.amazon.in/s?k=' + encodeURIComponent(query) + '&i=amazonfresh';
+    fetch(jinaUrl, { signal: AbortSignal.timeout(12000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[\u20b9₹]\.?\s*([0-9,]+(?:\.\d{1,2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = query;
+          for (var j = Math.max(0, i - 3); j < i; j++) {
+            var c = lines[j].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+            if (c.length > 5 && c.length < 100 && !c.match(/[\u20b9]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var qty = '';
+          var qtyRx = /\b(\d+\s*(?:kg|g|ml|l|L|litre?s?|pcs?|pack|count|box|pieces?|gm))\b/i;
+          for (var j2 = Math.max(0, i - 4); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+            var qm = lines[j2].match(qtyRx);
+            if (qm) { qty = qm[1].trim(); break; }
+          }
+          var key = 'AmazonFresh_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'Amazon Fresh', price: price, mrp: null, qty: qty, name: name.substring(0, 70), url: 'https://www.amazon.in/s?k=' + encodeURIComponent(query) + '&i=amazonfresh' });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
   }
 
   function searchDmart(query, callback) {
-    callback([]);
+    var jinaUrl = 'https://r.jina.ai/https://www.dmart.in/search?q=' + encodeURIComponent(query) + '&searchParam=k';
+    fetch(jinaUrl, { signal: AbortSignal.timeout(12000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[\u20b9₹]\.?\s*([0-9,]+(?:\.\d{1,2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = query;
+          for (var j = Math.max(0, i - 3); j < i; j++) {
+            var c = lines[j].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+            if (c.length > 5 && c.length < 100 && !c.match(/[\u20b9]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var qty = '';
+          var qtyRx = /\b(\d+\s*(?:kg|g|ml|l|L|litre?s?|pcs?|pack|count|box|pieces?|gm))\b/i;
+          for (var j2 = Math.max(0, i - 4); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+            var qm = lines[j2].match(qtyRx);
+            if (qm) { qty = qm[1].trim(); break; }
+          }
+          var key = 'DMart_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'DMart', price: price, mrp: null, qty: qty, name: name.substring(0, 70), url: 'https://www.dmart.in/search?q=' + encodeURIComponent(query) + '&searchParam=k' });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
   }
 
   function searchFlipkartMinutes(query, callback) {
-    callback([]);
+    var jinaUrl = 'https://r.jina.ai/https://www.flipkart.com/search?q=' + encodeURIComponent(query) + '&otracker=search&marketplace=GROCERY';
+    fetch(jinaUrl, { signal: AbortSignal.timeout(12000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[\u20b9₹]\.?\s*([0-9,]+(?:\.\d{1,2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = query;
+          for (var j = Math.max(0, i - 3); j < i; j++) {
+            var c = lines[j].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+            if (c.length > 5 && c.length < 100 && !c.match(/[\u20b9]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var qty = '';
+          var qtyRx = /\b(\d+\s*(?:kg|g|ml|l|L|litre?s?|pcs?|pack|count|box|pieces?|gm))\b/i;
+          for (var j2 = Math.max(0, i - 4); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+            var qm = lines[j2].match(qtyRx);
+            if (qm) { qty = qm[1].trim(); break; }
+          }
+          var key = 'FlipkartMin_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'Flipkart Min', price: price, mrp: null, qty: qty, name: name.substring(0, 70), url: 'https://www.flipkart.com/search?q=' + encodeURIComponent(query) + '&marketplace=GROCERY' });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
+  }
+
+  function searchJioMart(query, callback) {
+    var jinaUrl = 'https://r.jina.ai/https://www.jiomart.com/search/' + encodeURIComponent(query);
+    fetch(jinaUrl, { signal: AbortSignal.timeout(12000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[\u20b9₹]\.?\s*([0-9,]+(?:\.\d{1,2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = query;
+          for (var j = Math.max(0, i - 3); j < i; j++) {
+            var c = lines[j].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1');
+            if (c.length > 5 && c.length < 100 && !c.match(/[\u20b9]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var qty = '';
+          var qtyRx = /\b(\d+\s*(?:kg|g|ml|l|L|litre?s?|pcs?|pack|count|box|pieces?|gm))\b/i;
+          for (var j2 = Math.max(0, i - 4); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+            var qm = lines[j2].match(qtyRx);
+            if (qm) { qty = qm[1].trim(); break; }
+          }
+          var key = 'JioMart_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'JioMart', price: price, mrp: null, qty: qty, name: name.substring(0, 70), url: 'https://www.jiomart.com/search/' + encodeURIComponent(query) });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
   }
 
   function renderQcResults(results, query, startTime) {
@@ -1781,11 +1942,11 @@
         html += '<td><strong>' + formattedPrice + '</strong> ' + discount + '</td>';
         html += '</tr>';
       } else {
-        html += '<tr style="opacity:0.6;">';
+        html += '<tr style="opacity:0.75;">';
         html += '<td style="font-size:12px;">' + query + '</td>';
         html += '<td style="font-size:12px;text-align:center;">—</td>';
         html += '<td>' + r.merchant + '</td>';
-        html += '<td><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;">🔗 Search on ' + r.merchant + ' &rarr;</a></td>';
+        html += '<td><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;background:#e9c46a;padding:3px 8px;border:1px solid #000;">Search &rarr;</a></td>';
         html += '</tr>';
       }
     });
@@ -1907,6 +2068,229 @@
     var q = displayName + (qty ? ' ' + qty : '');
     el.innerHTML = '<p style="padding:10px;">Opening QuickCompare.in...</p><p style="font-size:13px;padding:6px;border:2px solid #000;background:#f4f1de;">🔍 <strong>' + q + '</strong></p><p style="font-size:10px;">Search term shown above — paste it into QuickCompare.in if not auto-filled. Requires <strong>location access</strong>.</p>';
     window.open('https://quickcompare.in/', '_blank');
+  }
+
+  // ==========================================
+  // 8-PLATFORM QCX ENGINE (embedded compare)
+  // ==========================================
+  var QCX_PLATFORMS = [
+    { id: 'blinkit',   label: 'Blinkit',          color: '#f9d835', textColor: '#000',
+      jina: function(q){ return 'https://r.jina.ai/https://blinkit.com/s/?q=' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://blinkit.com/s/?q=' + encodeURIComponent(q); } },
+    { id: 'zepto',     label: 'Zepto',             color: '#7b2ff7', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.zepto.com/search?query=' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://www.zepto.com/search?query=' + encodeURIComponent(q); } },
+    { id: 'instamart', label: 'Instamart',         color: '#fc8019', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(q); } },
+    { id: 'bigbasket', label: 'BigBasket',         color: '#84c225', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.bigbasket.com/ps/?q=' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://www.bigbasket.com/ps/?q=' + encodeURIComponent(q); } },
+    { id: 'dmart',     label: 'DMart',             color: '#d4145a', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.dmart.in/search?q=' + encodeURIComponent(q) + '&searchParam=k'; },
+      direct: function(q){ return 'https://www.dmart.in/search?q=' + encodeURIComponent(q) + '&searchParam=k'; } },
+    { id: 'jiomart',   label: 'JioMart',           color: '#003e7e', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.jiomart.com/search/' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://www.jiomart.com/search/' + encodeURIComponent(q); } },
+    { id: 'amazonfresh', label: 'Amazon Fresh',    color: '#ff9900', textColor: '#000',
+      jina: function(q){ return 'https://r.jina.ai/https://www.amazon.in/s?k=' + encodeURIComponent(q) + '&i=amazonfresh'; },
+      direct: function(q){ return 'https://www.amazon.in/s?k=' + encodeURIComponent(q) + '&i=amazonfresh'; } },
+    { id: 'flipkartmin', label: 'Flipkart Min',    color: '#2874f0', textColor: '#fff',
+      jina: function(q){ return 'https://r.jina.ai/https://www.flipkart.com/search?q=' + encodeURIComponent(q); },
+      direct: function(q){ return 'https://www.flipkart.com/search?q=' + encodeURIComponent(q); } }
+  ];
+
+  function setQcxItem(name) {
+    var el = document.getElementById('qcx-input');
+    if (el) { el.value = name; el.focus(); }
+  }
+
+  function qcxGetLocation() {
+    var city  = (document.getElementById('qcx-city')  || {}).value || 'Thane';
+    var pin   = (document.getElementById('qcx-pin')   || {}).value || '400607';
+    var state = (document.getElementById('qcx-state') || {}).value || 'Maharashtra';
+    return city.trim() + ' ' + pin.trim() + ', ' + state;
+  }
+
+  function qcxOpenAll() {
+    var q = (document.getElementById('qcx-input') || {}).value;
+    if (!q || !q.trim()) { alert('Enter a product name first.'); return; }
+    QCX_PLATFORMS.forEach(function(p, i) {
+      setTimeout(function() { window.open(p.direct(q.trim()), '_blank'); }, i * 350);
+    });
+  }
+
+  function qcxParsePrice(text, platformLabel) {
+    var lines = text.split('\n');
+    var priceRegex = /[₹\u20b9]\s*([0-9,]+(?:\.\d{1,2})?)/;
+    var results = [], seen = {};
+    var currentName = '';
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+
+      // Track product-name candidates
+      if (line.length > 6 && line.length < 120 && !line.match(/[₹\u20b9]/) && !line.match(/^\d/) && line.match(/[a-zA-Z\u0900-\u097F]/)) {
+        currentName = line.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[-–—|:#*]/g, ' ').replace(/\s+/g, ' ').trim();
+      }
+
+      var m = line.match(priceRegex);
+      if (!m) continue;
+      var price = parseFloat(m[1].replace(/,/g, ''));
+      if (price < 1 || price > 99999) continue;
+
+      // Try name from nearby lines
+      var name = currentName;
+      for (var j = Math.max(0, i - 3); j < i; j++) {
+        var c = lines[j].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[-–—|:#*]/g, ' ').trim();
+        if (c.length > 6 && c.length < 100 && !c.match(/[₹\u20b9]/) && !c.match(/^\d/) && c.match(/[a-zA-Z\u0900-\u097F]/)) {
+          name = c; break;
+        }
+      }
+      if (!name || name.length < 3) name = platformLabel + ' product';
+
+      // Capture qty
+      var qty = '';
+      var qtyRx = /\b(\d+[\s]*(?:kg|g|ml|l|L|litre?s?|pcs?|pack|count|box|pieces?|unit|tabs?|sachets?|gm))\b/i;
+      for (var j2 = Math.max(0, i - 4); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+        var qm = lines[j2].match(qtyRx);
+        if (qm) { qty = qm[1].trim(); break; }
+      }
+
+      // MRP (second price on same/next line, higher than price)
+      var mrp = null;
+      var restOfLine = line.substring(line.indexOf(m[0]) + m[0].length);
+      var mrpM = restOfLine.match(priceRegex);
+      if (!mrpM && i + 1 < lines.length) mrpM = lines[i + 1].match(priceRegex);
+      if (mrpM) {
+        var candidateMrp = parseFloat(mrpM[1].replace(/,/g, ''));
+        if (candidateMrp > price && candidateMrp < price * 3) mrp = candidateMrp;
+      }
+
+      var key = Math.round(price) + '_' + name.substring(0, 20);
+      if (seen[key]) continue;
+      seen[key] = true;
+
+      results.push({ platform: platformLabel, price: price, mrp: mrp, name: name.substring(0, 70), qty: qty });
+    }
+
+    results.sort(function(a, b) { return a.price - b.price; });
+    return results.slice(0, 5); // top 5 per platform
+  }
+
+  function runQcx() {
+    var q = (document.getElementById('qcx-input') || {}).value;
+    if (!q || !q.trim()) { alert('Enter a product name first.'); return; }
+    q = q.trim();
+    var loc = qcxGetLocation();
+    var el = document.getElementById('qcx-results');
+
+    el.innerHTML =
+      '<div style="border:2px solid #000;padding:10px;background:#f4f1de;margin-bottom:10px;">' +
+        '<div style="font-family:monospace;font-size:9px;opacity:0.6;">SEARCHING</div>' +
+        '<div style="font-weight:bold;font-size:15px;">' + q + '</div>' +
+        '<div style="font-size:11px;opacity:0.7;">&#128205; ' + loc + '</div>' +
+      '</div>' +
+      '<p style="text-align:center;font-family:monospace;font-size:12px;"><span class="spinner">&#8987;</span> Fetching prices from 8 platforms...</p>';
+
+    var startTime = Date.now();
+    var allRows = [];    // { platform, price, mrp, name, qty, direct }
+    var linkRows = [];   // platforms that gave no prices
+    var done = 0;
+    var total = QCX_PLATFORMS.length;
+
+    function collect(pf, results) {
+      if (results && results.length > 0) {
+        results.forEach(function(r) { r.direct = pf.direct(q); });
+        allRows = allRows.concat(results);
+      } else {
+        linkRows.push(pf);
+      }
+      done++;
+      if (done >= total) renderQcxResults(allRows, linkRows, q, loc, startTime);
+    }
+
+    QCX_PLATFORMS.forEach(function(pf) {
+      fetch(pf.jina(q), { signal: AbortSignal.timeout(14000) })
+        .then(function(r) { return r.text(); })
+        .then(function(text) {
+          if (!text || text.length < 200) { collect(pf, []); return; }
+          var parsed = qcxParsePrice(text, pf.label);
+          collect(pf, parsed);
+        })
+        .catch(function() { collect(pf, []); });
+    });
+  }
+
+  function renderQcxResults(rows, linkRows, query, loc, startTime) {
+    var el = document.getElementById('qcx-results');
+    var elapsed = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+
+    rows.sort(function(a, b) { return a.price - b.price; });
+
+    var html = '<div style="border:2px solid #000;padding:10px;background:#f4f1de;margin-bottom:12px;">' +
+      '<div style="font-family:monospace;font-size:9px;opacity:0.6;">RESULTS &mdash; ' + elapsed + '</div>' +
+      '<div style="font-weight:bold;font-size:15px;">' + query + '</div>' +
+      '<div style="font-size:11px;opacity:0.7;">&#128205; ' + loc + '</div>' +
+    '</div>';
+
+    if (rows.length > 0) {
+      // Best deal callout
+      var best = rows[0];
+      var pct  = (best.mrp && best.mrp > best.price) ? Math.round((1 - best.price / best.mrp) * 100) : null;
+      html += '<div style="border:3px solid #000;padding:12px;background:#b7e4c7;margin-bottom:12px;display:flex;align-items:center;gap:10px;">' +
+        '<span style="font-size:28px;">&#127942;</span>' +
+        '<div><div style="font-size:11px;font-family:monospace;text-transform:uppercase;opacity:0.7;">Best Price</div>' +
+        '<div style="font-weight:bold;font-size:18px;">&#8377;' + best.price.toLocaleString('en-IN') + '</div>' +
+        '<div style="font-size:13px;">' + best.platform +
+          (best.qty ? ' &middot; <span style="background:#e9c46a;padding:1px 6px;border:1px solid #000;font-size:11px;">' + best.qty + '</span>' : '') +
+          (pct ? ' &middot; <span style="color:#2a9d8f;font-weight:bold;">' + pct + '% off</span>' : '') +
+        '</div>' +
+        '<div style="font-size:11px;opacity:0.7;">' + best.name.substring(0, 50) + '</div></div>' +
+        '<a href="' + best.direct + '" target="_blank" style="margin-left:auto;background:#000;color:#fff;padding:8px 14px;font-size:12px;font-weight:bold;text-decoration:none;white-space:nowrap;">Buy &#8594;</a>' +
+      '</div>';
+
+      // Full table
+      html += '<table class="compare-table" style="margin-bottom:14px;">';
+      html += '<thead><tr><th>Product</th><th>Qty</th><th>Store</th><th>Price</th><th></th></tr></thead><tbody>';
+      rows.forEach(function(r, idx) {
+        var isLowest = (idx === 0);
+        var savePct = (r.mrp && r.mrp > r.price) ? Math.round((1 - r.price / r.mrp) * 100) : null;
+        html += '<tr class="' + (isLowest ? 'lowest' : '') + '">';
+        html += '<td style="font-size:11px;">' + r.name.substring(0, 40) + '</td>';
+        html += '<td style="font-size:11px;text-align:center;white-space:nowrap;">' + (r.qty || '&mdash;') + '</td>';
+        html += '<td style="font-size:12px;white-space:nowrap;">' + (isLowest ? '&#127942; ' : '') + r.platform + '</td>';
+        html += '<td style="white-space:nowrap;"><strong>&#8377;' + r.price.toLocaleString('en-IN') + '</strong>' +
+          (savePct ? '<br><span style="color:#2a9d8f;font-size:10px;">' + savePct + '% off</span>' : '') + '</td>';
+        html += '<td><a href="' + r.direct + '" target="_blank" style="font-size:11px;font-weight:bold;">&#8594;</a></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+    } else {
+      html += '<div style="text-align:center;padding:20px;font-family:monospace;font-size:12px;border:2px dashed #000;margin-bottom:12px;">&#9888;&#65039; Live prices could not be fetched (apps use JS rendering). Use direct links below.</div>';
+    }
+
+    // Direct links for all platforms (always shown)
+    html += '<div style="margin-top:4px;">';
+    html += '<div style="font-family:monospace;font-size:10px;text-transform:uppercase;letter-spacing:.1em;opacity:0.6;margin-bottom:8px;">Open directly on each platform &#8594;</div>';
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
+    QCX_PLATFORMS.forEach(function(pf) {
+      html += '<a href="' + pf.direct(query) + '" target="_blank" style="' +
+        'background:' + pf.color + ';color:' + pf.textColor + ';' +
+        'border:2px solid #000;padding:7px 12px;font-size:12px;font-weight:bold;' +
+        'text-decoration:none;white-space:nowrap;">' + pf.label + ' &#8594;</a>';
+    });
+    html += '</div></div>';
+
+    // Platforms with no live prices listed separately
+    if (linkRows.length > 0 && rows.length > 0) {
+      html += '<div style="margin-top:10px;font-family:monospace;font-size:10px;opacity:0.6;">';
+      html += 'No live prices from: ' + linkRows.map(function(p){ return p.label; }).join(', ');
+      html += ' (JS-rendered, click above to check)</div>';
+    }
+
+    el.innerHTML = html;
   }
 
   // ==========================================
@@ -2317,30 +2701,31 @@
         toolsSection.className = 'feed-section';
         toolsSection.innerHTML = `
           <div class="shop-tab-bar">
-            <button id="stb-search"   class="active-tab" onclick="shopTab('search')">🔍 Search</button>
-            <button id="stb-wishlist"             onclick="shopTab('wishlist')">❤️ Wishlist</button>
-            <button id="stb-deals"               onclick="shopTab('deals')">🔥 Sales Cal</button>
-            <button id="stb-cashback"            onclick="shopTab('cashback')">💰 Cashback</button>
-            <button id="stb-compare"             onclick="shopTab('compare')">🔗 Compare</button>
-            <button id="stb-quickcommerce"       onclick="shopTab('quickcommerce')">🛵 Quick Comm</button>
-            <button id="stb-compareqcom"         onclick="shopTab('compareqcom')">⚡ Compare QCom</button>
+            <button id="stb-search"        class="active-tab" onclick="shopTab('search')">🔍<br>Search</button>
+            <button id="stb-wishlist"      onclick="shopTab('wishlist')">❤️<br>Wishlist</button>
+            <button id="stb-deals"         onclick="shopTab('deals')">🔥<br>Sales</button>
+            <button id="stb-cashback"      onclick="shopTab('cashback')">💰<br>Cashback</button>
+            <button id="stb-compare"       onclick="shopTab('compare')">🔗<br>Compare</button>
+            <button id="stb-quickcommerce" onclick="shopTab('quickcommerce')">🛵<br>Q.Comm</button>
+            <button id="stb-compareqcom"   onclick="shopTab('compareqcom')">⚡<br>8-Platf</button>
           </div>
 
           <div id="shop-tab-search" class="shop-tab-panel">
             <div class="shop-section-label">Product Name or Paste URL</div>
-            <input class="shop-input" id="shop-q" type="text" placeholder="e.g. Samsung Galaxy S24, OnePlus TV, Nike shoes...">
+            <input class="shop-input" id="shop-q" type="text" placeholder="e.g. Samsung Galaxy S24, OnePlus TV, Nike shoes..." onkeydown="if(event.key==='Enter') shopSearch('google')">
 
             <div class="shop-section-label">Shop on</div>
             <div class="shop-portal-grid">
-              <button class="btn-amazon"   onclick="shopSearch('amazon')">🛒 Amazon</button>
-              <button class="btn-flipkart" onclick="shopSearch('flipkart')">🛍 Flipkart</button>
-              <button class="btn-myntra"   onclick="shopSearch('myntra')">👗 Myntra</button>
-              <button class="btn-meesho"   onclick="shopSearch('meesho')">🛍 Meesho</button>
-              <button class="btn-nykaa"    onclick="shopSearch('nykaa')">💄 Nykaa</button>
+              <button class="btn-amazon"    onclick="shopSearch('amazon')">🛒 Amazon</button>
+              <button class="btn-flipkart"  onclick="shopSearch('flipkart')">🛍 Flipkart</button>
+              <button class="btn-myntra"    onclick="shopSearch('myntra')">👗 Myntra</button>
+              <button class="btn-meesho"    onclick="shopSearch('meesho')">🛍 Meesho</button>
+              <button class="btn-nykaa"     onclick="shopSearch('nykaa')">💄 Nykaa</button>
               <button class="btn-instamart" onclick="shopSearch('instamart')">🛵 Instamart</button>
-              <button class="btn-dmart"    onclick="shopSearch('dmart')">🏪 DMart</button>
-
-              <button class="btn-google"   onclick="shopSearch('google')">🔍 Google Shop</button>
+              <button class="btn-dmart"     onclick="shopSearch('dmart')">🏪 DMart</button>
+              <button class="btn-google"    onclick="shopSearch('google')">🔍 Google Shop</button>
+              <button class="btn-flipkart"  onclick="shopSearch('flipkartmin')">⚡ Flipkart Min</button>
+              <button class="btn-amazon"    onclick="shopSearch('amazonfresh')">🌿 Amazon Fresh</button>
             </div>
 
             <div class="shop-section-label">Power Actions</div>
@@ -2488,21 +2873,55 @@
           <!-- QUICK COMMERCE TAB -->
           <div id="shop-tab-quickcommerce" class="shop-tab-panel" style="display:none;">
             <div class="shop-section-label">Quick Commerce Price Compare</div>
-            <div style="font-size:11px;margin-bottom:10px;">Compare prices across Blinkit, Zepto, Instamart, BigBasket &amp; more</div>
-            <input id="qc-input" type="text" placeholder="e.g. tata salt, amul milk, eggs..." style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;">
-            <button onclick="searchQuickCommerce()" style="width:100%;padding:12px;border:2px solid #000;background:#4a90d9;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:10px;">🛵 Search Quick Commerce</button>
+            <div style="font-size:11px;margin-bottom:8px;">Compare prices across Blinkit, Zepto, Instamart, BigBasket &amp; more</div>
+            <div class="shop-cat-chips" style="margin-bottom:10px;">
+              <button onclick="setQcCategory('tata salt')">&#x1F9C2; Salt</button>
+              <button onclick="setQcCategory('amul milk')">&#x1F95B; Milk</button>
+              <button onclick="setQcCategory('eggs')">&#x1F95A; Eggs</button>
+              <button onclick="setQcCategory('basmati rice')">&#x1F35A; Rice</button>
+              <button onclick="setQcCategory('atta wheat flour')">&#x1F33E; Atta</button>
+              <button onclick="setQcCategory('amul butter')">&#x1F9C8; Butter</button>
+              <button onclick="setQcCategory('toor dal')">&#x1FAD8; Dal</button>
+              <button onclick="setQcCategory('refined sunflower oil')">&#x1FAD9; Oil</button>
+              <button onclick="setQcCategory('onion')">&#x1F9C5; Onion</button>
+              <button onclick="setQcCategory('tomato')">&#x1F345; Tomato</button>
+              <button onclick="setQcCategory('paneer')">&#x1F9C0; Paneer</button>
+              <button onclick="setQcCategory('sugar')">&#x1F36C; Sugar</button>
+            </div>
+            <input id="qc-input" type="text" placeholder="e.g. tata salt, amul milk, eggs..." style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;" onkeydown="if(event.key==='Enter') searchQuickCommerce()">
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <button onclick="searchQuickCommerce()" style="flex:2;padding:12px;border:2px solid #000;background:#4a90d9;font-weight:bold;font-size:14px;cursor:pointer;">&#x1F6F5; Search &amp; Compare</button>
+              <button onclick="openAllQcom()" style="flex:1;padding:12px;border:2px solid #000;background:#81b29a;font-weight:bold;font-size:13px;cursor:pointer;">&#x1F517; Open All</button>
+            </div>
             <div id="qc-results"></div>
           </div>
 
-          <!-- COMPARE QCOM TAB -->
+          <!-- COMPARE QCOM TAB — Embedded 8-platform price fetcher -->
           <div id="shop-tab-compareqcom" class="shop-tab-panel" style="display:none;">
-            <div class="shop-section-label">QuickCompare.in</div>
-            <div style="font-size:11px;margin-bottom:10px;">Step 1: Paste product link or enter product name</div>
-            <input id="qcom-input" type="text" placeholder="Paste URL or type product name..." oninput="previewQcomUrl()" style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;">
-            <div id="qcom-preview" style="display:none;border:2px solid #000;padding:10px;margin-bottom:10px;background:#f4f1de;font-size:12px;"></div>
-            <button id="qcom-open-btn" disabled onclick="openQuickCompare()" style="width:100%;padding:12px;border:2px solid #000;background:#e07a5f;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:10px;opacity:0.4;">⚡ Open on QuickCompare.in</button>
-            <div id="qcom-results" style="font-family:monospace;font-size:11px;text-align:center;padding:10px;border:2px dashed #000;background:#fffdf5;">
-              Paste a URL above to auto-detect product &amp; size, then click Open.
+            <div class="shop-section-label">&#9889; 8-Platform QCommerce Compare</div>
+            <div style="font-size:11px;margin-bottom:8px;font-family:monospace;">Live prices from Blinkit · Zepto · Instamart · BigBasket · DMart · JioMart · Amazon Fresh · Flipkart Minutes</div>
+
+            <!-- Location strip -->
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+              <input id="qcx-city" type="text" placeholder="City" value="Thane" style="flex:2;min-width:70px;padding:8px;border:2px solid #000;font-size:13px;background:#fff;">
+              <input id="qcx-pin"  type="text" placeholder="Pincode" value="400607" style="flex:1;min-width:65px;padding:8px;border:2px solid #000;font-size:13px;background:#fff;">
+              <select id="qcx-state" style="flex:2;min-width:90px;padding:8px;border:2px solid #000;font-size:12px;background:#fff;font-weight:bold;">
+                <option>Maharashtra</option><option>Delhi</option><option>Karnataka</option>
+                <option>Tamil Nadu</option><option>Telangana</option><option>Gujarat</option>
+                <option>West Bengal</option><option>Rajasthan</option><option>Uttar Pradesh</option>
+                <option>Punjab</option><option>Haryana</option><option>Kerala</option>
+              </select>
+            </div>
+
+            <!-- Search input + button -->
+            <input id="qcx-input" type="text" placeholder="Type product name e.g. amul milk 1l, tata salt..." style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;" onkeydown="if(event.key==='Enter') runQcx()">
+            <div style="display:flex;gap:8px;margin-bottom:10px;">
+              <button onclick="runQcx()" style="flex:3;padding:12px;border:2px solid #000;background:#e07a5f;font-weight:bold;font-size:14px;cursor:pointer;">&#x26A1; Compare Across 8 Platforms</button>
+              <button onclick="qcxOpenAll()" title="Open all platforms in browser tabs" style="flex:1;padding:12px;border:2px solid #000;background:#81b29a;font-weight:bold;font-size:13px;cursor:pointer;">&#x1F517; All</button>
+            </div>
+
+            <div id="qcx-results" style="font-family:monospace;font-size:11px;text-align:center;padding:16px;border:2px dashed #000;background:#fffdf5;">
+              Enter a product above and tap Compare.
             </div>
           </div>
         `;
@@ -3141,7 +3560,7 @@
 </script>
 
 <script id="sw-src" type="text/plain">
-const CACHE = 'khichdi-v1';
+const CACHE = 'khichdi-v2';
 const OFFLINE_URL = './';
 self.addEventListener('install', e => { self.skipWaiting(); e.waitUntil(caches.open(CACHE).then(c => c.addAll([OFFLINE_URL]).catch(() => {}))); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -3150,8 +3569,8 @@ self.addEventListener('fetch', e => { const u = e.request.url; if (e.request.met
 <script>
 (function() {
   const manifest = {
-    name: "खिचडी 1L — Recipes · Stories · Videos",
-    short_name: "खिचडी 1L",
+    name: "खिचडी 1N — Recipes · Stories · Videos",
+    short_name: "खिचडी 1N",
     description: "Marathi recipes, stories, videos and lifestyle — ad-free reader",
     start_url: "./",
     display: "standalone",
@@ -3186,7 +3605,7 @@ self.addEventListener('fetch', e => { const u = e.request.url; if (e.request.met
     setTimeout(function() {
       var badge = document.createElement('div');
       badge.id = 'pwa-badge';
-      badge.innerHTML = '<span style="cursor:pointer;position:fixed;bottom:20px;left:16px;z-index:1300;background:#1a1a1a;color:#ece0c4;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 16px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;">⬇ Install खिचडी 1L</span>';
+      badge.innerHTML = '<span style="cursor:pointer;position:fixed;bottom:20px;left:16px;z-index:1300;background:#1a1a1a;color:#ece0c4;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 16px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;">⬇ Install खिचडी 1N</span>';
       badge.onclick = function(e) {
         if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt = null; badge.remove(); }); }
       };
