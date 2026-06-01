@@ -1010,8 +1010,8 @@
 
   function parseProductUrl(url) {
     var info = { name: '', portal: '', portalLabel: '' };
-    if (url.includes('amazon.in')) { info.portal = 'amazon'; info.portalLabel = 'Amazon'; }
-    else if (url.includes('flipkart.com')) { info.portal = 'flipkart'; info.portalLabel = 'Flipkart'; }
+    if (url.includes('amazon.in') || url.includes('amzn.in')) { info.portal = 'amazon'; info.portalLabel = 'Amazon'; }
+    else if (url.includes('flipkart.com') || url.includes('fkrt')) { info.portal = 'flipkart'; info.portalLabel = 'Flipkart'; }
     else if (url.includes('myntra.com')) { info.portal = 'myntra'; info.portalLabel = 'Myntra'; }
     else if (url.includes('meesho.com')) { info.portal = 'meesho'; info.portalLabel = 'Meesho'; }
     else if (url.includes('nykaa.com')) { info.portal = 'nykaa'; info.portalLabel = 'Nykaa'; }
@@ -1022,40 +1022,39 @@
       var segments = u.pathname.split('/').filter(Boolean);
 
       function isJunk(str) {
-        if (str.length < 4) return true;
-        if (/^(dp|itm|pd|pr|pid|ref|p|gp|product|detail|sku|in|en|amp|images|img|media|uploads|static|assets|css|js|fonts|common|index|default)\b/i.test(str)) return true;
+        if (str.length < 3) return true;
+        if (/^(dp|itm|pd|pr|pid|ref|p|gp|product|detail|sku|in|en|amp|images|img|media|uploads|static|assets|css|js|fonts|common|index|default|shop|store|buy|new|old|best|top)\b/i.test(str)) return true;
         if (/^\d{6,}$/.test(str)) return true;
-        // Random token: mixed case + digits, 5-15 chars, no separators
-        if (/^[A-Za-z0-9]{5,15}$/.test(str) && /[A-Z]/.test(str) && /[a-z]/.test(str) && /[0-9]/.test(str)) {
-          // Check it's not a common readable word
-          if (!/[aeiou]{2}/i.test(str) && str.length < 12) return true;
+        if (/^[A-Za-z0-9]{5,15}$/.test(str) && /[A-Z]/.test(str) && /[a-z]/.test(str) && /[0-9]/.test(str) && !str.includes('-')) {
+          if (str.length < 12 && !/[aeiouy]{2}/i.test(str)) return true;
         }
         return false;
       }
 
-      // Prefer segments with hyphens (word-based product names)
-      var best = '';
+      // Score each segment: hyphens good, longer better, readable words good
+      var scored = [];
       for (var i = 0; i < segments.length; i++) {
         var raw = segments[i];
-        if (isJunk(raw)) continue;
-        var s = raw.replace(/[_-]/g, ' ');
-        if (s.length > best.length) {
-          // Boost segments that had hyphens (readable product names)
-          if (raw.indexOf('-') !== -1) s = s + ' ';
-          best = s;
-        }
+        if (isJunk(raw)) { scored.push({ raw: raw, score: -1 }); continue; }
+        var s = raw.replace(/[_-]/g, ' ').trim();
+        if (s.length < 3) { scored.push({ raw: raw, score: -1 }); continue; }
+        var score = s.length;
+        if (raw.indexOf('-') !== -1) score += 20;
+        if (/[aeiou]/i.test(s.replace(/\s/g, ''))) score += 10;
+        if (/^\d/.test(s)) score -= 5;
+        scored.push({ raw: raw, text: s, score: score });
       }
-
-      if (best) {
-        info.name = best.replace(/\b\w/g, function(c) { return c.toUpperCase(); }).trim();
+      scored.sort(function(a, b) { return b.score - a.score; });
+      if (scored.length && scored[0].score > 0) {
+        info.name = scored[0].text.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
       }
 
       if (!info.name && u.searchParams) {
-        var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search') || u.searchParams.get('url');
-        if (kw) info.name = kw;
+        var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search') || u.searchParams.get('url') || u.searchParams.get('product');
+        if (kw) info.name = decodeURIComponent(kw.replace(/\+/g, ' '));
       }
     } catch(e) {}
-    if (!info.name || info.name.length < 3) info.name = 'product';
+    if (!info.name || info.name.trim().length < 2) info.name = '';
     return info;
   }
 
@@ -1063,12 +1062,95 @@
     var url = document.getElementById('compare-url-input').value.trim();
     if (!url) { alert('Please paste a product link first.'); return; }
     var info = parseProductUrl(url);
-    if (!info.name) { alert('Could not identify the product from this link. Please paste a product page URL.'); return; }
     var query = info.name;
-    var encoded = encodeURIComponent(query);
-    var resultsEl = document.getElementById('compare-results');
-    resultsEl.innerHTML = '<p class="loading">🔍 Searching for best prices of "' + query + '" across portals...</p>';
 
+    var isShortUrl = url.match(/amzn\.in|fkrt\.?|mny\.ms|nykaa\.me|meesho\.[a-z]{2,3}\/[a-z]/i);
+
+    if (!query) {
+      if (isShortUrl) {
+        query = 'Amazon Product';
+        // Try to resolve short URL in background
+        resolveShortUrl(url, function(resolved) {
+          if (resolved) {
+            showPortalLinks({ name: resolved, portal: info.portal, portalLabel: info.portalLabel }, resolved);
+          }
+        });
+      } else {
+        query = url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || 'product';
+      }
+    }
+
+    showPortalLinks(info, query);
+    attemptLiveFetch(info, query);
+  }
+
+  function resolveShortUrl(url, callback) {
+    var proxies = [
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+      'https://corsproxy.io/?' + encodeURIComponent(url)
+    ];
+    var tried = 0;
+    function tryNext() {
+      if (tried >= proxies.length) { callback(''); return; }
+      fetch(proxies[tried], { signal: AbortSignal.timeout(6000) })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          // Try to extract title
+          var m = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+          if (m) {
+            var title = m[1].replace(/&#[0-9]+;/g, ' ').replace(/\s+/g, ' ').trim();
+            // Clean up Amazon title suffixes like ": Amazon.in: ..."
+            title = title.replace(/\s*[:|]\s*(Amazon|Flipkart|Myntra).*$/i, '').trim();
+            if (title.length > 5) { callback(title); return; }
+          }
+          throw Error('no title');
+        })
+        .catch(function() { tried++; tryNext(); });
+    }
+    tryNext();
+  }
+
+  function showPortalLinks(info, query) {
+    var el = document.getElementById('compare-results');
+    var locStr = getLocationStr();
+    var encoded = encodeURIComponent(query);
+    var locEncoded = encodeURIComponent(' ' + locStr);
+
+    var portals = [
+      { key: 'amazon', label: 'Amazon', color: '#ff9900', txt: '#000', url: 'https://www.amazon.in/s?k=' + encoded + locEncoded },
+      { key: 'flipkart', label: 'Flipkart', color: '#2874f0', txt: '#fff', url: 'https://www.flipkart.com/search?q=' + encoded + locEncoded },
+      { key: 'myntra', label: 'Myntra', color: '#f04e98', txt: '#fff', url: 'https://www.myntra.com/' + encoded },
+      { key: 'meesho', label: 'Meesho', color: '#f43397', txt: '#fff', url: 'https://www.meesho.com/search?q=' + encoded + locEncoded },
+      { key: 'nykaa', label: 'Nykaa', color: '#fc2779', txt: '#fff', url: 'https://www.nykaa.com/search/result/?q=' + encoded + locEncoded },
+      { key: 'instamart', label: 'Instamart', color: '#fc8019', txt: '#fff', url: 'https://www.swiggy.com/instamart/search?query=' + encoded + locEncoded },
+      { key: 'dmart', label: 'DMart', color: '#d4145a', txt: '#fff', url: 'https://www.dmart.in/search?q=' + encoded + locEncoded },
+      { key: 'google', label: 'Google Shop', color: '#4285f4', txt: '#fff', url: 'https://www.google.com/search?tbm=shop&q=' + encoded + locEncoded }
+    ];
+
+    var html = '<div class="compare-product-info">';
+    html += '<div class="label">🔍 Searching for</div>';
+    html += '<div class="value">' + query + '</div>';
+    if (info.portalLabel) {
+      html += '<span class="compare-source-badge" style="background:#e9c46a;">📦 Pasted from ' + info.portalLabel + '</span> ';
+    }
+    html += '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span> ';
+    html += '</div>';
+
+    html += '<div class="shop-section-label">🔗 Compare Across Portals</div>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">';
+    portals.forEach(function(p) {
+      var isSource = p.key === info.portal;
+      html += '<button onclick="window.open(\'' + p.url + '\',\'_blank\')" style="padding:12px 6px;border:2px solid #000;background:' + (isSource ? '#e9c46a' : p.color) + ';color:' + (isSource ? '#000' : p.txt) + ';font-weight:bold;cursor:pointer;font-size:12px;">' + (isSource ? '📌 ' : '') + p.label + '</button>';
+    });
+    html += '</div>';
+
+    html += '<button onclick="' + portals.map(function(p) { return 'window.open(\'' + p.url + '\',\'_blank\')'; }).join(';setTimeout(function(){},300);') + '" style="width:100%;padding:13px;border:3px solid #000;background:#e07a5f;color:#000;font-weight:bold;font-size:14px;cursor:pointer;">🚀 Compare All (Open ' + portals.length + ' Tabs)</button>';
+
+    el.innerHTML = html;
+  }
+
+  function attemptLiveFetch(info, query) {
+    var resultsEl = document.getElementById('compare-results');
     var locStr = getLocationStr();
     var searchQ = encodeURIComponent(query + ' price India ' + locStr);
     var gsUrl = 'https://www.google.com/search?tbm=shop&q=' + searchQ + '&hl=en-IN&gl=IN';
@@ -1079,44 +1161,35 @@
       'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(gsUrl)
     ];
 
-    function tryProxies(index) {
-      if (index >= proxies.length) {
-        // Last resort: try regular Google search (sometimes has price panels)
-        var gsUrl2 = 'https://www.google.com/search?q=' + searchQ + '&hl=en-IN&gl=IN';
-        var altProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(gsUrl2);
-        fetch(altProxy, { signal: AbortSignal.timeout(8000) })
+    function tryProxies(idx) {
+      if (idx >= proxies.length) {
+        // Last try: regular Google search
+        var altUrl = 'https://www.google.com/search?q=' + searchQ + '&hl=en-IN&gl=IN';
+        fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(altUrl), { signal: AbortSignal.timeout(8000) })
           .then(function(r) { return r.text(); })
           .then(function(html) {
-            if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) throw Error('Blocked');
-            var prices = parseGoogleShoppingPrices(html, info.portal, query);
+            if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) throw Error('blocked');
+            var prices = parseShoppingPrices(html, info.portal, query);
             if (prices && prices.length > 0) { renderPriceComparison(prices, info, query); }
-            else { throw Error('No prices'); }
           })
-          .catch(function() { renderPriceFallback(info, query); });
+          .catch(function() {});
         return;
       }
-      fetch(proxies[index], { signal: AbortSignal.timeout(8000) })
+      fetch(proxies[idx], { signal: AbortSignal.timeout(6000) })
         .then(function(r) { return r.text(); })
         .then(function(html) {
-          if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) {
-            throw new Error('Blocked or empty');
-          }
-          var prices = parseGoogleShoppingPrices(html, info.portal, query);
-          if (prices && prices.length > 0) {
-            renderPriceComparison(prices, info, query);
-          } else {
-            throw new Error('No prices found');
-          }
+          if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) throw Error('blocked');
+          var prices = parseShoppingPrices(html, info.portal, query);
+          if (prices && prices.length > 0) { renderPriceComparison(prices, info, query); }
+          else { throw Error('no prices'); }
         })
-        .catch(function() {
-          tryProxies(index + 1);
-        });
+        .catch(function() { tryProxies(idx + 1); });
     }
 
     tryProxies(0);
   }
 
-  function parseGoogleShoppingPrices(html, sourcePortal, searchQuery) {
+  function parseShoppingPrices(html, sourcePortal, searchQuery) {
     var results = [];
     var seen = {};
 
@@ -1260,48 +1333,6 @@
       html += '</tbody></table>';
       html += '</div>';
     }
-
-    el.innerHTML = html;
-  }
-
-  function renderPriceFallback(info, query) {
-    var el = document.getElementById('compare-results');
-    var locStr = getLocationStr();
-    var locEncoded = encodeURIComponent(' ' + locStr);
-    var encoded = encodeURIComponent(query);
-    var portalUrls = {
-      amazon: 'https://www.amazon.in/s?k=' + encoded + locEncoded,
-      flipkart: 'https://www.flipkart.com/search?q=' + encoded + locEncoded,
-      myntra: 'https://www.myntra.com/' + encoded,
-      meesho: 'https://www.meesho.com/search?q=' + encoded + locEncoded,
-      nykaa: 'https://www.nykaa.com/search/result/?q=' + encoded + locEncoded,
-      instamart: 'https://www.swiggy.com/instamart/search?query=' + encoded + locEncoded,
-      dmart: 'https://www.dmart.in/search?q=' + encoded + locEncoded,
-      google: 'https://www.google.com/search?tbm=shop&q=' + encoded + locEncoded
-    };
-
-    var html = '<div class="compare-product-info">';
-    html += '<div class="label">Parsed Product</div>';
-    html += '<div class="value">' + info.name + '</div>';
-    if (info.portalLabel) {
-      html += '<span class="compare-source-badge" style="background:#e9c46a;">📦 ' + info.portalLabel + '</span> ';
-    }
-    html += '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + getLocationStr() + '</span> ';
-    html += '</div>';
-
-    html += '<div class="compare-error">';
-    html += '<p>⚠️ Could not fetch live prices from Google Shopping.</p>';
-    html += '<p style="font-size:11px;margin-bottom:14px;">Search manually on each portal below (location: ' + getLocationStr() + '):</p>';
-    html += '</div>';
-
-    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
-    Object.keys(portalUrls).forEach(function(key) {
-      var labels = { amazon:'Amazon', flipkart:'Flipkart', myntra:'Myntra', meesho:'Meesho', nykaa:'Nykaa', instamart:'Instamart', dmart:'DMart', google:'Google Shop' };
-      var colors = { amazon:'#ff9900', flipkart:'#2874f0', myntra:'#f04e98', meesho:'#f43397', nykaa:'#fc2779', instamart:'#fc8019', dmart:'#d4145a', google:'#4285f4' };
-      var isSource = key === info.portal;
-      html += '<button onclick="window.open(\'' + portalUrls[key] + '\',\'_blank\')" style="padding:10px;border:2px solid #000;background:' + (isSource ? '#e9c46a' : colors[key]) + ';font-weight:bold;cursor:pointer;font-size:12px;' + (key === 'flipkart' || key === 'myntra' || key === 'meesho' || key === 'nykaa' || key === 'instamart' || key === 'dmart' ? 'color:#fff;' : '') + '">' + (isSource ? '📌 ' : '') + labels[key] + '</button>';
-    });
-    html += '</div>';
 
     el.innerHTML = html;
   }
