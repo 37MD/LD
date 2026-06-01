@@ -276,6 +276,14 @@
     text-align: center;
     padding: 20px 0;
   }
+  .spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 
   /* Search & Interactive Tools Input Styling */
   .search-input {
@@ -1058,6 +1066,32 @@
     return info;
   }
 
+  function generateQueryVariations(name) {
+    var parts = name.split(' ').filter(Boolean);
+    if (parts.length <= 3) return [name];
+    var variations = [];
+    variations.push(name);
+    // Remove trailing generic words (Replacer, Substitute, etc.)
+    var trimmed = name;
+    var genericWords = ['replacer', 'substitute', 'replacement', 'pack', 'combo', 'set', 'bundle'];
+    for (var i = 0; i < 3; i++) {
+      var last = trimmed.split(' ').pop().toLowerCase();
+      if (genericWords.indexOf(last) !== -1 || last.length < 3) {
+        trimmed = trimmed.split(' ').slice(0, -1).join(' ');
+        if (trimmed && variations.indexOf(trimmed) === -1) variations.push(trimmed);
+      } else break;
+    }
+    // Remove brand (first word) for broader match
+    if (parts.length > 3) {
+      var noBrand = parts.slice(1).join(' ');
+      if (variations.indexOf(noBrand) === -1) variations.push(noBrand);
+    }
+    // Also try without the last word if it's long
+    var short = parts.slice(0, -1).join(' ');
+    if (short && short !== name && variations.indexOf(short) === -1) variations.push(short);
+    return variations.slice(0, 4);
+  }
+
   function compareProductPrice() {
     var url = document.getElementById('compare-url-input').value.trim();
     if (!url) { alert('Please paste a product link first.'); return; }
@@ -1068,24 +1102,29 @@
     if (!query && isShortUrl) {
       resolveShortUrlTitle(url, function(title) {
         var q = title || url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || 'product';
-        searchAll(q, info.portal);
+        var vars = generateQueryVariations(q);
+        searchAll(vars, info.portal);
       });
       return;
     }
 
     if (!query) query = url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || 'product';
 
-    searchAll(query, info.portal);
+    var variations = generateQueryVariations(query);
+    searchAll(variations, info.portal);
   }
 
-  function searchAll(query, sourcePortal) {
+  function searchAll(queries, sourcePortal) {
+    if (typeof queries === 'string') queries = [queries];
+    var mainQuery = queries[0];
+
     var el = document.getElementById('compare-results');
     var locStr = getLocationStr();
-    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + query + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching Smartprix, BuyHatke & CompareKarle...</p>';
+    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching ' + queries.length + ' variations across Smartprix, BuyHatke & CompareKarle...</p>';
 
     var allResults = [];
     var completed = 0;
-    var total = 3;
+    var total = queries.length * 3;
 
     function collect(source, results) {
       if (results && results.length > 0) {
@@ -1094,7 +1133,6 @@
       }
       completed++;
       if (completed >= total) {
-        // Deduplicate by merchant+rounded price
         var seen = {};
         var merged = [];
         allResults.sort(function(a, b) { return a.price - b.price; });
@@ -1103,16 +1141,18 @@
           if (!seen[key]) { seen[key] = true; merged.push(r); }
         });
         if (merged.length > 0) {
-          renderPriceResults(merged, query);
+          renderPriceResults(merged, mainQuery);
         } else {
-          el.innerHTML = '<div class="compare-error"><p>⚠️ No prices found on Smartprix, BuyHatke or CompareKarle.</p><p style="font-size:11px;">Try searching directly: <a href="https://www.smartprix.com/s/?q=' + encodeURIComponent(query) + '" target="_blank" style="font-weight:bold;">Smartprix</a> &middot; <a href="https://buyhatke.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="font-weight:bold;">BuyHatke</a> &middot; <a href="https://comparekarle.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="font-weight:bold;">CompareKarle</a></p></div>';
+          el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><div class="compare-error"><p>⚠️ No prices found on Smartprix, BuyHatke or CompareKarle.</p><p style="font-size:11px;">Try searching directly: <a href="https://www.smartprix.com/s/?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">Smartprix</a> &middot; <a href="https://buyhatke.com/search?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">BuyHatke</a> &middot; <a href="https://comparekarle.com/search?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">CompareKarle</a></p></div>';
         }
       }
     }
 
-    searchSmartprix(query, sourcePortal, collect);
-    searchBuyhatke(query, sourcePortal, collect);
-    searchComparekarle(query, sourcePortal, collect);
+    queries.forEach(function(q) {
+      searchSmartprix(q, sourcePortal, collect);
+      searchBuyhatke(q, sourcePortal, collect);
+      searchComparekarle(q, sourcePortal, collect);
+    });
   }
 
   function resolveShortUrlTitle(url, callback) {
@@ -1385,6 +1425,13 @@
     return results;
   }
 
+  function extractQty(str) {
+    var m = str.match(/(\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?))/i) ||
+            str.match(/(\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc))/i) ||
+            str.match(/(\d+[\s]*[xX][\s]*\d+)/);
+    return m ? m[1].trim() : '';
+  }
+
   function renderPriceResults(results, query) {
     var el = document.getElementById('compare-results');
     var locStr = getLocationStr();
@@ -1397,7 +1444,7 @@
     html += '</div>';
 
     html += '<table class="compare-table">';
-    html += '<thead><tr><th>Product Name</th><th>Store</th><th>Price</th></tr></thead>';
+    html += '<thead><tr><th>Product Name</th><th>Qty / Size</th><th>Store</th><th>Price</th></tr></thead>';
     html += '<tbody>';
 
     results.forEach(function(r, idx) {
@@ -1405,9 +1452,11 @@
       var rowClass = isLowest ? 'lowest' : (r.isSource ? 'source-row' : '');
       var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
       var sourceBadge = r.source === 'Smartprix' ? '<span class="compare-source-badge" style="background:#e9c46a;font-size:9px;">S</span>' : r.source === 'BuyHatke' ? '<span class="compare-source-badge" style="background:#e76f51;font-size:9px;">BH</span>' : '<span class="compare-source-badge" style="background:#4a90d9;font-size:9px;">CK</span>';
+      var qty = r.qty || extractQty(r.name);
 
       html += '<tr class="' + rowClass + '">';
-      html += '<td style="font-size:12px;">' + sourceBadge + ' ' + r.name.substring(0, 60) + '</td>';
+      html += '<td style="font-size:12px;">' + sourceBadge + ' ' + r.name.replace(/\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?)|\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc)\s*/gi, '').substring(0, 50) + '</td>';
+      html += '<td style="font-size:12px;text-align:center;white-space:nowrap;">' + (qty || '—') + '</td>';
       html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + (isLowest ? ' <span style="font-size:10px;font-weight:normal;">Lowest</span>' : '') + '</td>';
       html += '<td><strong>' + formattedPrice + '</strong></td>';
       html += '</tr>';
@@ -1443,27 +1492,34 @@
   function searchQuickCommerce() {
     var input = document.getElementById('qc-input').value.trim();
     if (!input) { alert('Enter a product name first.'); return; }
+    // Extract product name if a URL was pasted
+    if (/^https?:\/\//.test(input)) {
+      var parsed = parseProductUrl(input);
+      if (parsed.name) input = parsed.name;
+    }
     var el = document.getElementById('qc-results');
     var locStr = getLocationStr();
-    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching Blinkit, Zepto, Instamart & BigBasket...</p>';
+    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading"><span class="spinner">⟳</span> Searching Blinkit, Zepto, Instamart & BigBasket...</p>';
 
     var startTime = Date.now();
     var allResults = [];
     var completed = 0;
+    var blinkitDone = false;
 
     function collect(platform, results) {
       if (results && results.length > 0) {
         results.forEach(function(r) { r.platform = platform; });
         allResults = allResults.concat(results);
       } else {
-        // No results — add a link-only placeholder row
         var pf = QC_PLATFORMS.filter(function(p) { return p.id === platform; })[0];
         if (pf) {
           allResults.push({ merchant: pf.name, price: null, mrp: null, name: null, url: pf.url + encodeURIComponent(input), platform: platform, linkOnly: true });
         }
       }
+      if (platform === 'blinkit') blinkitDone = true;
       completed++;
-      if (completed >= QC_PLATFORMS.length) {
+      // Show Blinkit results immediately, then update as others come in
+      if (completed >= QC_PLATFORMS.length || (blinkitDone && completed >= 2)) {
         allResults.sort(function(a, b) {
           if (a.price === null && b.price === null) return 0;
           if (a.price === null) return 1;
@@ -1508,12 +1564,20 @@
       var name = '';
       for (var j = Math.max(0, i - 3); j <= i; j++) {
         var candidate = lines[j].trim();
-        if (candidate && !candidate.match(/[₹]/) && !candidate.match(/^\d+\s*(kg|g|l|ml|L|pack|pieces?|count|box)/i) && candidate.length > 3 && candidate.length < 100) {
+        if (candidate && !candidate.match(/[₹]/) && !candidate.match(/^\d+\s*(kg|g|l|ml|L|pack|pcs|pc|unit|count|box|pieces?)/i) && candidate.length > 3 && candidate.length < 100) {
           name = candidate;
           break;
         }
       }
       if (!name) name = searchQuery;
+
+      // Capture quantity/size from nearby lines
+      var qty = '';
+      var qtyRegex = /\b(\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc|tabs?|tablets?|sachets?|sticks?))\b/i;
+      for (var j2 = Math.max(0, i - 5); j2 <= Math.min(lines.length - 1, i + 2); j2++) {
+        var qm = lines[j2].trim().match(qtyRegex);
+        if (qm) { qty = qm[1]; break; }
+      }
 
       var mrp = null;
       for (var k = i; k <= Math.min(i + 2, lines.length - 1); k++) {
@@ -1533,6 +1597,7 @@
         price: price,
         mrp: mrp,
         name: name.substring(0, 80),
+        qty: qty,
         url: 'https://blinkit.com/s/?q=' + encodeURIComponent(searchQuery)
       });
     }
@@ -1641,7 +1706,7 @@
     var html = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + query + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span><span style="font-family:monospace;font-size:10px;margin-left:8px;opacity:0.6;">' + elapsed + '</span></div>';
 
     html += '<table class="compare-table">';
-    html += '<thead><tr><th>Product Name</th><th>Store</th><th>Price</th><th>MRP</th></tr></thead>';
+    html += '<thead><tr><th>Product Name</th><th>Qty / Size</th><th>Store</th><th>Price</th><th>MRP</th></tr></thead>';
     html += '<tbody>';
 
     results.forEach(function(r) {
@@ -1650,9 +1715,11 @@
         var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
         var formattedMrp = r.mrp ? '₹' + r.mrp.toLocaleString('en-IN') : '—';
         var discount = (r.mrp && r.mrp > r.price) ? '<span style="color:#2a9d8f;font-size:10px;"> ' + Math.round((1 - r.price / r.mrp) * 100) + '% off</span>' : '';
+        var qty = r.qty || extractQty(r.name || '');
 
         html += '<tr class="' + (isLowest ? 'lowest' : '') + '">';
-        html += '<td style="font-size:12px;">' + r.name + '</td>';
+        html += '<td style="font-size:12px;">' + (r.name || query).replace(/\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?)|\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc)\s*/gi, '').substring(0, 50) + '</td>';
+        html += '<td style="font-size:12px;text-align:center;white-space:nowrap;">' + (qty || '—') + '</td>';
         html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + '</td>';
         html += '<td><strong>' + formattedPrice + '</strong> ' + discount + '</td>';
         html += '<td style="text-decoration:line-through;color:#999;">' + formattedMrp + '</td>';
@@ -1660,6 +1727,7 @@
       } else {
         html += '<tr style="opacity:0.6;">';
         html += '<td style="font-size:12px;">' + query + '</td>';
+        html += '<td style="font-size:12px;text-align:center;">—</td>';
         html += '<td>' + r.merchant + '</td>';
         html += '<td colspan="2"><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;">🔗 Search on ' + r.merchant + ' &rarr;</a></td>';
         html += '</tr>';
