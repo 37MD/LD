@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>खिचडी 1N — Recipes · Stories · Videos</title>
+<title>खिचडी 1O — Recipes · Stories · Videos</title>
 <meta name="theme-color" content="#ece0c4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -543,22 +543,6 @@
     background: #f5efe1;
     margin-bottom: 20px;
   }
-  .shop-cat-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    margin-bottom: 12px;
-  }
-  .shop-cat-chips button {
-    padding: 6px 12px;
-    border: 2px solid #000;
-    background: #ece0c4;
-    font-size: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 20px;
-  }
-  .shop-cat-chips button:hover { background: #e9c46a; }
   .shop-input {
     width: 100%;
     padding: 11px;
@@ -706,6 +690,94 @@
     padding: 30px 20px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
+  }
+
+  .flights-box {
+    border: 2px solid #000;
+    padding: 16px;
+    margin-bottom: 20px;
+    background: #f5efe1;
+  }
+  .flights-box .fb-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 10px;
+  }
+  .flights-box label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .flights-box input, .flights-box select {
+    width: 100%;
+    padding: 9px;
+    border: 2px solid #000;
+    font-size: 13px;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    background: #fff;
+  }
+  .flights-box .fb-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .flights-box .fb-row input,
+  .flights-box .fb-row select {
+    flex: 1;
+    min-width: 100px;
+  }
+  .flights-box .fb-btn {
+    width: 100%;
+    padding: 11px;
+    border: 2px solid #000;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    background: #7ba0c4;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .flights-box .fb-btn:hover {
+    filter: brightness(0.9);
+  }
+  .flights-box .fb-result {
+    border: 2px solid #000;
+    padding: 12px;
+    background: #fffdf5;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+  .flights-box .fb-airport-found {
+    background: #b8d5c6;
+    padding: 8px 12px;
+    border: 2px solid #000;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  .flights-box .fb-links {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .flights-box .fb-links a {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px;
+    border: 2px solid #000;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: center;
+    text-decoration: none;
+    background: #e9c46a;
+  }
+  .flights-box .fb-links a:hover {
+    filter: brightness(0.9);
   }
 
 </style>
@@ -869,6 +941,193 @@
     }
     
     window.open(url, '_blank');
+  }
+
+  // ==========================================
+  // FLIGHTS — Nearest Airport & Price Compare
+  // ==========================================
+
+  var AIRPORT_MAP = {
+    'shimla':         { code: 'SLV', name: 'Shimla Airport', city: 'Shimla' },
+    'manali':         { code: 'KUU', name: 'Kullu-Manali Airport (Bhuntar)', city: 'Kullu' },
+    'kullu':          { code: 'KUU', name: 'Kullu-Manali Airport (Bhuntar)', city: 'Kullu' },
+    'darjeeling':     { code: 'IXB', name: 'Bagdogra Airport', city: 'Bagdogra' },
+    'gangtok':        { code: 'IXB', name: 'Bagdogra Airport', city: 'Bagdogra' },
+    'nainital':       { code: 'PGH', name: 'Pantnagar Airport', city: 'Pantnagar' },
+    'mussoorie':      { code: 'DED', name: 'Jolly Grant Airport (Dehradun)', city: 'Dehradun' },
+    'rishikesh':      { code: 'DED', name: 'Jolly Grant Airport (Dehradun)', city: 'Dehradun' },
+    'dehradun':       { code: 'DED', name: 'Jolly Grant Airport (Dehradun)', city: 'Dehradun' },
+    'ooty':           { code: 'CJB', name: 'Coimbatore International', city: 'Coimbatore' },
+    'coorg':          { code: 'IXE', name: 'Mangalore International', city: 'Mangalore' },
+    'munnar':         { code: 'COK', name: 'Cochin International', city: 'Kochi' },
+    'srinagar':       { code: 'SXR', name: 'Srinagar International', city: 'Srinagar' },
+    'gulmarg':        { code: 'SXR', name: 'Srinagar International', city: 'Srinagar' },
+    'pahalgam':       { code: 'SXR', name: 'Srinagar International', city: 'Srinagar' },
+    'sonamarg':       { code: 'SXR', name: 'Srinagar International', city: 'Srinagar' },
+    'leh':            { code: 'IXL', name: 'Leh Kushok Bakula Rimpochee', city: 'Leh' },
+    'ladakh':         { code: 'IXL', name: 'Leh Kushok Bakula Rimpochee', city: 'Leh' },
+    'jaipur':         { code: 'JAI', name: 'Jaipur International', city: 'Jaipur' },
+    'udaipur':        { code: 'UDR', name: 'Maharana Pratap Airport (Udaipur)', city: 'Udaipur' },
+    'jodhpur':        { code: 'JDH', name: 'Jodhpur Airport', city: 'Jodhpur' },
+    'jaisalmer':      { code: 'JSA', name: 'Jaisalmer Airport', city: 'Jaisalmer' },
+    'bikaner':        { code: 'BKB', name: 'Bikaner Airport', city: 'Bikaner' },
+    'agra':           { code: 'AGR', name: 'Agra Airport', city: 'Agra' },
+    'delhi':          { code: 'DEL', name: 'Indira Gandhi International', city: 'Delhi' },
+    'varanasi':       { code: 'VNS', name: 'Lal Bahadur Shastri International (Varanasi)', city: 'Varanasi' },
+    'khajuraho':      { code: 'HJR', name: 'Khajuraho Airport', city: 'Khajuraho' },
+    'goa':            { code: 'GOI', name: 'Goa International (Mopa/Dabolim)', city: 'Goa' },
+    'panjim':         { code: 'GOI', name: 'Goa International (Mopa/Dabolim)', city: 'Goa' },
+    'kochi':          { code: 'COK', name: 'Cochin International', city: 'Kochi' },
+    'alleppey':       { code: 'COK', name: 'Cochin International', city: 'Kochi' },
+    'kovalam':        { code: 'TRV', name: 'Trivandrum International', city: 'Thiruvananthapuram' },
+    'trivandrum':     { code: 'TRV', name: 'Trivandrum International', city: 'Thiruvananthapuram' },
+    'gokarna':        { code: 'IXE', name: 'Mangalore International', city: 'Mangalore' },
+    'pondicherry':    { code: 'PNY', name: 'Puducherry Airport', city: 'Puducherry' },
+    'andaman':        { code: 'IXZ', name: 'Veer Savarkar International (Port Blair)', city: 'Port Blair' },
+    'port blair':     { code: 'IXZ', name: 'Veer Savarkar International (Port Blair)', city: 'Port Blair' },
+    'tirupati':       { code: 'TIR', name: 'Tirupati Airport', city: 'Tirupati' },
+    'amritsar':       { code: 'ATQ', name: 'Sri Guru Ram Das Jee International', city: 'Amritsar' },
+    'bodh gaya':      { code: 'GAY', name: 'Gaya Airport', city: 'Gaya' },
+    'haridwar':       { code: 'DED', name: 'Jolly Grant Airport (Dehradun)', city: 'Dehradun' },
+    'puri':           { code: 'BBI', name: 'Biju Patnaik International (Bhubaneswar)', city: 'Bhubaneswar' },
+    'konark':         { code: 'BBI', name: 'Biju Patnaik International (Bhubaneswar)', city: 'Bhubaneswar' },
+    'bhubaneswar':    { code: 'BBI', name: 'Biju Patnaik International (Bhubaneswar)', city: 'Bhubaneswar' },
+    'dwarka':         { code: 'JGA', name: 'Jamnagar Airport', city: 'Jamnagar' },
+    'shirdi':         { code: 'SAG', name: 'Shirdi Airport', city: 'Shirdi' },
+    'mathura':        { code: 'AGR', name: 'Agra Airport', city: 'Agra' },
+    'vrindavan':      { code: 'AGR', name: 'Agra Airport', city: 'Agra' },
+    'somnath':        { code: 'IXK', name: 'Keshod Airport', city: 'Keshod' },
+    'ajmer':          { code: 'JAI', name: 'Jaipur International', city: 'Jaipur' },
+    'pushkar':        { code: 'JAI', name: 'Jaipur International', city: 'Jaipur' },
+    'sarnath':        { code: 'VNS', name: 'Lal Bahadur Shastri International (Varanasi)', city: 'Varanasi' },
+    'mumbai':         { code: 'BOM', name: 'Chhatrapati Shivaji Maharaj International', city: 'Mumbai' },
+    'bangalore':      { code: 'BLR', name: 'Kempegowda International', city: 'Bengaluru' },
+    'bengaluru':      { code: 'BLR', name: 'Kempegowda International', city: 'Bengaluru' },
+    'chennai':        { code: 'MAA', name: 'Chennai International', city: 'Chennai' },
+    'hyderabad':      { code: 'HYD', name: 'Rajiv Gandhi International', city: 'Hyderabad' },
+    'kolkata':        { code: 'CCU', name: 'Netaji Subhas Chandra Bose International', city: 'Kolkata' },
+    'ahmedabad':      { code: 'AMD', name: 'Sardar Vallabhbhai Patel International', city: 'Ahmedabad' },
+    'surat':          { code: 'STV', name: 'Surat International', city: 'Surat' },
+    'pune':           { code: 'PNQ', name: 'Pune International', city: 'Pune' },
+    'lucknow':        { code: 'LKO', name: 'Chaudhary Charan Singh International', city: 'Lucknow' },
+    'guwahati':       { code: 'GAU', name: 'Lokpriya Gopinath Bordoloi International', city: 'Guwahati' },
+    'shillong':       { code: 'SHL', name: 'Shillong Airport', city: 'Shillong' },
+    'aurangabad':     { code: 'IXU', name: 'Aurangabad Airport', city: 'Aurangabad' },
+    'ajanta':         { code: 'IXU', name: 'Aurangabad Airport', city: 'Aurangabad' },
+    'ellora':         { code: 'IXU', name: 'Aurangabad Airport', city: 'Aurangabad' },
+    'sanchi':         { code: 'BHO', name: 'Raja Bhoj Airport (Bhopal)', city: 'Bhopal' },
+    'hampi':          { code: 'JTR', name: 'Jindal Vijaynagar Airport (Toranagallu)', city: 'Toranagallu' },
+    'mysore':         { code: 'MYQ', name: 'Mysore Airport', city: 'Mysore' },
+    'dharamshala':    { code: 'DHM', name: 'Kangra Airport (Gaggal)', city: 'Dharamshala' },
+    'mcleodganj':     { code: 'DHM', name: 'Kangra Airport (Gaggal)', city: 'Dharamshala' },
+    'kutch':          { code: 'BHJ', name: 'Bhuj Airport', city: 'Bhuj' },
+    'ranthambore':    { code: 'JAI', name: 'Jaipur International', city: 'Jaipur' },
+    'jim corbett':    { code: 'PGH', name: 'Pantnagar Airport', city: 'Pantnagar' },
+    'kanha':          { code: 'JLR', name: 'Jabalpur Airport', city: 'Jabalpur' },
+    'bandhavgarh':    { code: 'JLR', name: 'Jabalpur Airport', city: 'Jabalpur' },
+    'kaziranga':      { code: 'GAU', name: 'Lokpriya Gopinath Bordoloi International', city: 'Guwahati' },
+    'gir':            { code: 'RAJ', name: 'Rajkot International', city: 'Rajkot' },
+    'periyar':        { code: 'COK', name: 'Cochin International', city: 'Kochi' },
+    'tawang':         { code: 'IXI', name: 'Lilabari Airport (North Lakhimpur)', city: 'Lilabari' },
+    'spiti':          { code: 'KUU', name: 'Kullu-Manali Airport (Bhuntar)', city: 'Kullu' },
+    'kerala':         { code: 'COK', name: 'Cochin International', city: 'Kochi' }
+  };
+
+  function findNearestAirport() {
+    var spot = document.getElementById('fl-spot').value.trim().toLowerCase();
+    var resultEl = document.getElementById('fl-airport-result');
+    var formEl = document.getElementById('fl-search-form');
+    if (!spot) { alert('Please enter a tourist spot name.'); return; }
+
+    var match = AIRPORT_MAP[spot];
+    if (!match) {
+      // Try partial match
+      var keys = Object.keys(AIRPORT_MAP);
+      for (var i = 0; i < keys.length; i++) {
+        if (spot.indexOf(keys[i]) !== -1 || keys[i].indexOf(spot) !== -1) {
+          match = AIRPORT_MAP[keys[i]];
+          break;
+        }
+      }
+    }
+
+    if (match) {
+      resultEl.innerHTML = '<div class="fb-airport-found">&#9992;&#65039; Nearest Airport: <strong>' + match.name + ' [' + match.code + ']</strong> &mdash; ' + match.city + '</div>';
+      document.getElementById('fl-to-code').value = match.code;
+      document.getElementById('fl-to-name').value = match.name;
+      formEl.style.display = 'block';
+      document.getElementById('fl-from').focus();
+    } else {
+      resultEl.innerHTML = '<div class="fb-result">&#9940; No airport found for "' + spot + '". Please enter the destination airport code manually below.</div>';
+      formEl.style.display = 'block';
+    }
+  }
+
+  function searchFlights() {
+    var from = document.getElementById('fl-from').value.trim();
+    var toCode = document.getElementById('fl-to-code').value;
+    var toName = document.getElementById('fl-to-name').value;
+    var date = document.getElementById('fl-date').value;
+    var ret = document.getElementById('fl-return').value;
+    var resultEl = document.getElementById('fl-results');
+
+    if (!from) { alert('Please enter your departure city.'); return; }
+    if (!date) { alert('Please select a departure date.'); return; }
+
+    var fromEnc = encodeURIComponent(from);
+    var toEnc = encodeURIComponent(toCode || toName || 'destination');
+    var dateStr = date.split('-').reverse().join('/');
+    var retStr = ret ? ret.split('-').reverse().join('/') : '';
+
+    var googleUrl = 'https://www.google.com/travel/flights?q=Flights+to+' + (toCode || toName) + '+from+' + fromEnc + '+on+' + date + (ret ? '+return+on+' + ret : '');
+    var ixigoUrl = 'https://www.ixigo.com/flights/search?from=' + fromEnc + '&to=' + toEnc + '&departureDate=' + date + (ret ? '&returnDate=' + ret : '');
+    var skyscannerUrl = 'https://www.skyscanner.com/transport/flights/' + fromEnc + '/' + toEnc + '/' + date.split('-').join('') + (ret ? '/' + ret.split('-').join('') : '');
+    var easemytripUrl = 'https://www.easemytrip.com/flights.html?search=' + fromEnc + '-' + toEnc + '-' + dateStr + (ret ? '-' + retStr : '');
+
+    var html = '<div class="fb-title">&#9992;&#65039; Flight Search Results</div>';
+    html += '<div style="font-size:12px;margin-bottom:8px;">';
+    html += '<strong>' + from + '</strong> &rarr; <strong>' + (toCode || toName) + '</strong>';
+    html += ' &middot; ' + date;
+    if (ret) html += ' &middot; Return: ' + ret;
+    html += '</div>';
+
+    html += '<div class="fb-links">';
+    html += '<a href="' + googleUrl + '" target="_blank" style="background:#4a90d9;color:#000!important;">&#128269; Google Flights</a>';
+    html += '<a href="' + ixigoUrl + '" target="_blank" style="background:#e9c46a;color:#000!important;">&#128269; ixigo</a>';
+    html += '<a href="' + skyscannerUrl + '" target="_blank" style="background:#81b29a;color:#000!important;">&#128269; Skyscanner</a>';
+    html += '<a href="' + easemytripUrl + '" target="_blank" style="background:#f0a08a;color:#000!important;">&#128269; EaseMyTrip</a>';
+    html += '</div>';
+
+    resultEl.innerHTML = html;
+  }
+
+  function searchHotels() {
+    var dest = document.getElementById('ht-dest').value.trim();
+    var checkin = document.getElementById('ht-checkin').value;
+    var checkout = document.getElementById('ht-checkout').value;
+    var resultEl = document.getElementById('ht-results');
+    if (!dest) { alert('Please enter a destination city.'); return; }
+    if (!checkin || !checkout) { alert('Please select check-in and check-out dates.'); return; }
+
+    var destEnc = encodeURIComponent(dest);
+    var checkinFmt = checkin.split('-').reverse().join('/');
+    var checkoutFmt = checkout.split('-').reverse().join('/');
+
+    var goibiboUrl = 'https://www.goibibo.com/hotels/search/?city=' + destEnc + '&checkin=' + checkin + '&checkout=' + checkout;
+    var mmtUrl = 'https://www.makemytrip.com/hotels/hotel-listing/?checkin=' + checkin + '&checkout=' + checkout + '&city=' + destEnc;
+    var agodaUrl = 'https://www.agoda.com/search?city=' + destEnc + '&checkIn=' + checkin + '&checkOut=' + checkout;
+    var oyoUrl = 'https://www.oyorooms.com/search/?city=' + destEnc + '&checkin=' + checkinFmt + '&checkout=' + checkoutFmt;
+
+    var html = '<div class="fb-title">&#127976; Hotel Search Results</div>';
+    html += '<div style="font-size:12px;margin-bottom:8px;"><strong>' + dest + '</strong> &middot; ' + checkin + ' to ' + checkout + '</div>';
+    html += '<div class="fb-links">';
+    html += '<a href="' + goibiboUrl + '" target="_blank" style="background:#4a90d9;">&#128269; Goibibo</a>';
+    html += '<a href="' + mmtUrl + '" target="_blank" style="background:#e9c46a;">&#128269; MakeMyTrip</a>';
+    html += '<a href="' + agodaUrl + '" target="_blank" style="background:#81b29a;">&#128269; Agoda</a>';
+    html += '<a href="' + oyoUrl + '" target="_blank" style="background:#f0a08a;">&#128269; OYO</a>';
+    html += '</div>';
+
+    resultEl.innerHTML = html;
   }
 
   // ==========================================
@@ -1094,31 +1353,6 @@
     return info;
   }
 
-  function generateQueryVariations(name) {
-    var parts = name.split(' ').filter(Boolean);
-    if (parts.length <= 3) return [name];
-    var variations = [];
-    variations.push(name);
-    // Remove trailing generic words (Replacer, Substitute, etc.)
-    var trimmed = name;
-    var genericWords = ['replacer', 'substitute', 'replacement', 'pack', 'combo', 'set', 'bundle'];
-    for (var i = 0; i < 3; i++) {
-      var last = trimmed.split(' ').pop().toLowerCase();
-      if (genericWords.indexOf(last) !== -1 || last.length < 3) {
-        trimmed = trimmed.split(' ').slice(0, -1).join(' ');
-        if (trimmed && variations.indexOf(trimmed) === -1) variations.push(trimmed);
-      } else break;
-    }
-    // Remove brand (first word) for broader match
-    if (parts.length > 3) {
-      var noBrand = parts.slice(1).join(' ');
-      if (variations.indexOf(noBrand) === -1) variations.push(noBrand);
-    }
-    // Also try without the last word if it's long
-    var short = parts.slice(0, -1).join(' ');
-    if (short && short !== name && variations.indexOf(short) === -1) variations.push(short);
-    return variations.slice(0, 4);
-  }
 
   function showUrlPreview() {
     var el = document.getElementById('compare-url-preview');
@@ -1150,57 +1384,91 @@
     if (!query && isShortUrl) {
       resolveShortUrlTitle(url, function(title) {
         var q = title || url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || 'product';
-        var vars = generateQueryVariations(q);
-        searchAll(vars, info.portal);
+        searchAll(q, url, info.portal);
       });
       return;
     }
 
     if (!query) query = url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || 'product';
 
-    var variations = generateQueryVariations(query);
-    searchAll(variations, info.portal);
+    searchAll(query, url, info.portal);
   }
 
-  function searchAll(queries, sourcePortal) {
-    if (typeof queries === 'string') queries = [queries];
-    var mainQuery = queries[0];
-
+  function searchAll(mainQuery, originalUrl, sourcePortal) {
     var el = document.getElementById('compare-results');
     var locStr = getLocationStr();
-    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching ' + queries.length + ' variations across Smartprix, BuyHatke & CompareKarle...</p>';
+    var enc = encodeURIComponent(mainQuery);
 
-    var allResults = [];
-    var completed = 0;
-    var total = queries.length * 3;
+    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Looking up prices...</p>';
 
-    function collect(source, results) {
-      if (results && results.length > 0) {
-        results.forEach(function(r) { r.source = source; });
-        allResults = allResults.concat(results);
+    // Try to fetch price from the original product page (Flipkart works via Jina)
+    tryFetchPrice(originalUrl, function(priceData) {
+      var html = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div>';
+
+      if (priceData) {
+        html += '<div style="border:2px solid #52b788;padding:14px;margin:10px 0;background:#f0faf4;border-radius:0;">';
+        html += '<div style="font-size:10px;font-family:monospace;opacity:0.6;margin-bottom:2px;">PRICE FROM YOUR LINK</div>';
+        html += '<div style="font-size:26px;font-weight:bold;">₹' + priceData.price.toLocaleString('en-IN') + '</div>';
+        html += '<div style="font-size:12px;margin-top:2px;">at <strong>' + priceData.merchant + '</strong></div>';
+        if (priceData.mrp) html += '<div style="font-size:11px;opacity:0.6;margin-top:2px;">MRP <s>₹' + priceData.mrp.toLocaleString('en-IN') + '</s></div>';
+        html += '</div>';
+      } else {
+        html += '<div style="border:2px solid #e07a5f;padding:14px;margin:10px 0;background:#fff9f0;border-radius:0;">';
+        html += '<div style="font-size:12px;">⚠️ Could not fetch price from the original link. The store may be blocking price lookups.</div>';
+        html += '</div>';
       }
-      completed++;
-      if (completed >= total) {
-        var seen = {};
-        var merged = [];
-        allResults.sort(function(a, b) { return a.price - b.price; });
-        allResults.forEach(function(r) {
-          var key = r.merchant + '_' + Math.round(r.price);
-          if (!seen[key]) { seen[key] = true; merged.push(r); }
-        });
-        if (merged.length > 0) {
-          renderPriceResults(merged, mainQuery);
-        } else {
-          el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + mainQuery + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><div class="compare-error"><p>⚠️ No prices found on Smartprix, BuyHatke or CompareKarle.</p><p style="font-size:11px;">Try searching directly: <a href="https://www.smartprix.com/s/?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">Smartprix</a> &middot; <a href="https://buyhatke.com/search?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">BuyHatke</a> &middot; <a href="https://comparekarle.com/search?q=' + encodeURIComponent(mainQuery) + '" target="_blank" style="font-weight:bold;">CompareKarle</a></p></div>';
-        }
-      }
-    }
 
-    queries.forEach(function(q) {
-      searchSmartprix(q, sourcePortal, collect);
-      searchBuyhatke(q, sourcePortal, collect);
-      searchComparekarle(q, sourcePortal, collect);
+      var portals = [
+        { name: 'Amazon',      url: 'https://www.amazon.in/s?k=' + enc,                         color: '#ff9900', icon: '🛒' },
+        { name: 'Flipkart',    url: 'https://www.flipkart.com/search?q=' + enc,                 color: '#2874f0', icon: '🛍' },
+        { name: 'Smartprix',   url: 'https://www.smartprix.com/products?q=' + enc,              color: '#e91e63', icon: '📊' },
+        { name: 'BuyHatke',    url: 'https://buyhatke.com/search?product=' + enc,               color: '#4caf50', icon: '🔗' },
+        { name: 'CompareKarle',url: 'https://comparekarle.com/search?q=' + enc,                 color: '#9c27b0', icon: '⚖️' },
+        { name: 'Google Shop', url: 'https://www.google.com/search?tbm=shop&q=' + enc,          color: '#4285f4', icon: '🔍' },
+        { name: 'Myntra',      url: 'https://www.myntra.com/' + enc.replace(/%20/g, '-'),        color: '#e04e6f', icon: '👗' },
+        { name: 'Meesho',      url: 'https://www.meesho.com/search?q=' + enc,                   color: '#b36b5e', icon: '🛍' }
+      ];
+
+      html += '<div style="margin:10px 0;font-size:11px;font-family:monospace;opacity:0.7;">🔍 Compare on other stores:</div>';
+      html += '<div class="shop-portal-grid">';
+      portals.forEach(function(p) {
+        html += '<button onclick="window.open(\'' + p.url + '\',\'_blank\')" style="background:' + p.color + ';color:#fff;padding:10px;border:2px solid #000;font-weight:bold;font-size:13px;cursor:pointer;border-radius:0;">' + p.icon + ' ' + p.name + '</button>';
+      });
+      html += '</div>';
+
+      el.innerHTML = html;
     });
+  }
+
+  function tryFetchPrice(url, callback) {
+    if (!url || !url.match(/flipkart\.com|dl\.flipkart/i)) { callback(null); return; }
+
+    var jinaUrl = 'https://r.jina.ai/' + encodeURIComponent(url);
+    fetch(jinaUrl, { signal: AbortSignal.timeout(10000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 200) { callback(null); return; }
+
+        // Flipkart: price pattern like "[5% 208 ₹198]" or just "₹198" near product
+        var m = text.match(/\[[^\]]*?\d+%\s*([\d,]+)\s+₹\s*([\d,]+)[^\]]*\]/);
+        if (m) {
+          callback({ price: parseFloat(m[2].replace(/,/g, '')), merchant: 'Flipkart', mrp: parseFloat(m[1].replace(/,/g, '')) });
+          return;
+        }
+
+        // Fallback: first ₹ price in first 100 lines
+        var lines = text.split('\n');
+        for (var i = 0; i < Math.min(100, lines.length); i++) {
+          var pm = lines[i].match(/₹\s*([\d,]+(?:\.\d{2})?)/);
+          if (pm) {
+            var p = parseFloat(pm[1].replace(/,/g, ''));
+            if (p > 10 && p < 999999) { callback({ price: p, merchant: 'Flipkart' }); return; }
+          }
+        }
+
+        callback(null);
+      })
+      .catch(function() { callback(null); });
   }
 
   function resolveShortUrlTitle(url, callback) {
@@ -1218,315 +1486,11 @@
       .catch(function() { callback(''); });
   }
 
-  function searchSmartprix(query, sourcePortal, callback) {
-    var jinaUrl = 'https://r.jina.ai/http://www.smartprix.com/s/?q=' + encodeURIComponent(query);
-    fetch(jinaUrl, { signal: AbortSignal.timeout(15000) })
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        if (text.length < 200) throw Error('empty');
-        var results = parseSmartprixText(text, sourcePortal, query);
-        callback('Smartprix', results);
-      })
-      .catch(function() { callback('Smartprix', []); });
-  }
-
-  function searchBuyhatke(query, sourcePortal, callback) {
-    var jinaUrl = 'https://r.jina.ai/http://buyhatke.com/search?q=' + encodeURIComponent(query);
-    fetch(jinaUrl, { signal: AbortSignal.timeout(15000) })
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        if (text.length < 200) throw Error('empty');
-        var results = parseBuyhatkeText(text, sourcePortal, query);
-        callback('BuyHatke', results);
-      })
-      .catch(function() { callback('BuyHatke', []); });
-  }
-
-  function searchComparekarle(query, sourcePortal, callback) {
-    var jinaUrl = 'https://r.jina.ai/http://comparekarle.com/search?q=' + encodeURIComponent(query);
-    fetch(jinaUrl, { signal: AbortSignal.timeout(15000) })
-      .then(function(r) { return r.text(); })
-      .then(function(text) {
-        if (text.length < 200) throw Error('empty');
-        var results = parseComparekarleText(text, sourcePortal, query);
-        callback('CompareKarle', results);
-      })
-      .catch(function() { callback('CompareKarle', []); });
-  }
-
-  function parseSmartprixText(text, sourcePortal, searchQuery) {
-    // Jina returns clean markdown/text from Smartprix product listing pages.
-    var results = [], seen = {};
-    var lines = text.split('\n');
-    var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
-    var merchants = [
-      'amazon', 'flipkart', 'myntra', 'meesho', 'nykaa',
-      'croma', 'reliance', 'tatacliq', 'snapdeal', 'shopclues'
-    ];
-    var currentName = '';
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-
-      // Track heading-like lines as potential product names
-      if (line.match(/^#{1,3}\s/) || line.match(/^\d+[.)]\s/) || line.match(/^\*\*/)) {
-        currentName = line.replace(/^[#*\d.)\s]+/, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[-–—|:]/g, ' ').trim();
-      }
-
-      var m = line.match(priceRegex);
-      if (!m) continue;
-      var price = parseFloat(m[1].replace(/,/g, ''));
-      if (price < 10 || price > 999999) continue;
-
-      // Get product name from this line, previous line, or currentName
-      var name = line.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[-–—|:]/g, ' ').replace(/[₹][0-9,]+(\.\d{2})?/g, '').trim();
-      if (name.length < 3 && i > 0) name = lines[i - 1].trim().replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[-–—|:]/g, ' ').trim();
-      if (name.length < 3) name = currentName;
-      if (name.length < 3) name = searchQuery;
-
-      // Check nearby lines for merchant/store name
-      var block = '';
-      for (var j = Math.max(0, i - 3); j <= Math.min(lines.length - 1, i + 3); j++) {
-        block += ' ' + lines[j];
-      }
-      block = block.toLowerCase();
-
-      // Also check URL lines in the block for merchant hints
-      var urlMatch = block.match(/\(https?:\/\/([^\/]+)/);
-      var urlDomain = urlMatch ? urlMatch[1] : '';
-
-      var merchant = '';
-      for (var k = 0; k < merchants.length; k++) {
-        if (block.indexOf(merchants[k]) !== -1 || urlDomain.indexOf(merchants[k]) !== -1) {
-          merchant = merchants[k].charAt(0).toUpperCase() + merchants[k].slice(1);
-          if (merchant === 'Reliance') merchant = 'Reliance Digital';
-          if (merchant === 'Tatacliq') merchant = 'Tata Cliq';
-          break;
-        }
-      }
-
-      // If no merchant found in block, try the full line set for this section
-      if (!merchant) {
-        // Check if price line itself contains store name
-        for (var k2 = 0; k2 < merchants.length; k2++) {
-          if (line.toLowerCase().indexOf(merchants[k2]) !== -1) {
-            merchant = merchants[k2].charAt(0).toUpperCase() + merchants[k2].slice(1);
-            if (merchant === 'Reliance') merchant = 'Reliance Digital';
-            if (merchant === 'Tatacliq') merchant = 'Tata Cliq';
-            break;
-          }
-        }
-      }
-      if (!merchant) merchant = 'Online Store';
-
-      var key = merchant + '_' + Math.round(price);
-      if (seen[key]) continue;
-      seen[key] = true;
-
-      var isSource = block.indexOf(sourcePortal) !== -1;
-      results.push({
-        merchant: merchant,
-        price: price,
-        isSource: isSource,
-        name: name,
-        url: 'https://www.smartprix.com/s/?q=' + encodeURIComponent(query + ' ' + merchant)
-      });
-    }
-
-    results.sort(function(a, b) { return a.price - b.price; });
-    return results;
-  }
-
-  function parseBuyhatkeText(text, sourcePortal, searchQuery) {
-    var results = [], seen = {};
-    var lines = text.split('\n');
-    var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
-    var merchants = [
-      'amazon', 'flipkart', 'myntra', 'meesho', 'nykaa',
-      'croma', 'reliance', 'tatacliq', 'snapdeal', 'shopclues'
-    ];
-    var currentName = '';
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-
-      // Track potential product name lines
-      if (line.match(/^[A-Z][a-z]/) && !line.match(/[₹]/) && line.length > 15 && line.length < 120) {
-        currentName = line.replace(/[-–—|:]/g, ' ').trim();
-      }
-
-      var m = line.match(priceRegex);
-      if (!m) continue;
-      var price = parseFloat(m[1].replace(/,/g, ''));
-      if (price < 10 || price > 999999) continue;
-
-      // Get product name from context
-      var name = line.replace(/[₹][0-9,]+(\.\d{2})?/g, '').replace(/[-–—|:]/g, ' ').trim();
-      if (name.length < 3 && i > 0) name = lines[i - 1].trim().replace(/[-–—|:]/g, ' ').trim();
-      if (name.length < 3) name = currentName;
-      if (name.length < 3) name = searchQuery;
-
-      // Check nearby lines for merchant/store name
-      var block = '';
-      for (var j = Math.max(0, i - 3); j <= Math.min(lines.length - 1, i + 3); j++) {
-        block += ' ' + lines[j];
-      }
-      block = block.toLowerCase();
-
-      var urlMatch = block.match(/\(https?:\/\/([^\/]+)/);
-      var urlDomain = urlMatch ? urlMatch[1] : '';
-
-      var merchant = '';
-      for (var k = 0; k < merchants.length; k++) {
-        if (block.indexOf(merchants[k]) !== -1 || urlDomain.indexOf(merchants[k]) !== -1) {
-          merchant = merchants[k].charAt(0).toUpperCase() + merchants[k].slice(1);
-          if (merchant === 'Reliance') merchant = 'Reliance Digital';
-          if (merchant === 'Tatacliq') merchant = 'Tata Cliq';
-          break;
-        }
-      }
-      if (!merchant) merchant = 'Online Store';
-
-      var key = merchant + '_' + Math.round(price);
-      if (seen[key]) continue;
-      seen[key] = true;
-
-      var isSource = block.indexOf(sourcePortal) !== -1;
-      results.push({
-        merchant: merchant,
-        price: price,
-        isSource: isSource,
-        name: name,
-        url: 'https://buyhatke.com/search?q=' + encodeURIComponent(searchQuery + ' ' + merchant)
-      });
-    }
-
-    results.sort(function(a, b) { return a.price - b.price; });
-    return results;
-  }
-
-  function parseComparekarleText(text, sourcePortal, searchQuery) {
-    var results = [], seen = {};
-    var lines = text.split('\n');
-    var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
-    var merchants = [
-      'amazon', 'flipkart', 'myntra', 'meesho', 'nykaa',
-      'croma', 'reliance', 'tatacliq', 'snapdeal', 'shopclues'
-    ];
-    var currentName = '';
-
-    for (var i = 0; i < lines.length; i++) {
-      var line = lines[i].trim();
-      if (!line) continue;
-
-      if (line.match(/^[A-Z][a-z]/) && !line.match(/[₹]/) && line.length > 15 && line.length < 120) {
-        currentName = line.replace(/[-–—|:]/g, ' ').trim();
-      }
-
-      var m = line.match(priceRegex);
-      if (!m) continue;
-      var price = parseFloat(m[1].replace(/,/g, ''));
-      if (price < 10 || price > 999999) continue;
-
-      var name = line.replace(/[₹][0-9,]+(\.\d{2})?/g, '').replace(/[-–—|:]/g, ' ').trim();
-      if (name.length < 3 && i > 0) name = lines[i - 1].trim().replace(/[-–—|:]/g, ' ').trim();
-      if (name.length < 3) name = currentName;
-      if (name.length < 3) name = searchQuery;
-
-      var block = '';
-      for (var j = Math.max(0, i - 3); j <= Math.min(lines.length - 1, i + 3); j++) {
-        block += ' ' + lines[j];
-      }
-      block = block.toLowerCase();
-
-      var urlMatch = block.match(/\(https?:\/\/([^\/]+)/);
-      var urlDomain = urlMatch ? urlMatch[1] : '';
-
-      var merchant = '';
-      for (var k = 0; k < merchants.length; k++) {
-        if (block.indexOf(merchants[k]) !== -1 || urlDomain.indexOf(merchants[k]) !== -1) {
-          merchant = merchants[k].charAt(0).toUpperCase() + merchants[k].slice(1);
-          if (merchant === 'Reliance') merchant = 'Reliance Digital';
-          if (merchant === 'Tatacliq') merchant = 'Tata Cliq';
-          break;
-        }
-      }
-      if (!merchant) merchant = 'Online Store';
-
-      var key = merchant + '_' + Math.round(price);
-      if (seen[key]) continue;
-      seen[key] = true;
-
-      var isSource = block.indexOf(sourcePortal) !== -1;
-      results.push({
-        merchant: merchant,
-        price: price,
-        isSource: isSource,
-        name: name,
-        url: 'https://comparekarle.com/search?q=' + encodeURIComponent(searchQuery + ' ' + merchant)
-      });
-    }
-
-    results.sort(function(a, b) { return a.price - b.price; });
-    return results;
-  }
-
   function extractQty(str) {
     var m = str.match(/(\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?))/i) ||
             str.match(/(\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc))/i) ||
             str.match(/(\d+[\s]*[xX][\s]*\d+)/);
     return m ? m[1].trim() : '';
-  }
-
-  function renderPriceResults(results, query) {
-    var el = document.getElementById('compare-results');
-    var locStr = getLocationStr();
-    var html = '';
-
-    html += '<div class="compare-product-info">';
-    html += '<div class="label">🔍 Product</div>';
-    html += '<div class="value">' + query + '</div>';
-    html += '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span> ';
-    html += '</div>';
-
-    html += '<table class="compare-table">';
-    html += '<thead><tr><th>Product Name</th><th>Qty / Size</th><th>Store</th><th>Price</th></tr></thead>';
-    html += '<tbody>';
-
-    results.forEach(function(r, idx) {
-      var isLowest = (idx === 0);
-      var rowClass = isLowest ? 'lowest' : (r.isSource ? 'source-row' : '');
-      var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
-      var sourceBadge = r.source === 'Smartprix' ? '<span class="compare-source-badge" style="background:#e9c46a;font-size:9px;">S</span>' : r.source === 'BuyHatke' ? '<span class="compare-source-badge" style="background:#e76f51;font-size:9px;">BH</span>' : '<span class="compare-source-badge" style="background:#4a90d9;font-size:9px;">CK</span>';
-      var qty = r.qty || extractQty(r.name);
-
-      html += '<tr class="' + rowClass + '">';
-      html += '<td style="font-size:12px;">' + sourceBadge + ' ' + r.name.replace(/\d+[\s]*[xX][\s]*\d+\s*(kg|g|l|ml|L|pcs|packs?|count|box|pieces?)|\d+\s*(kg|g|ml|l|L|pcs|packs?|count|box|pieces?|unit|pc)\s*/gi, '').substring(0, 50) + '</td>';
-      html += '<td style="font-size:12px;text-align:center;white-space:nowrap;">' + (qty || '—') + '</td>';
-      html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + (isLowest ? ' <span style="font-size:10px;font-weight:normal;">Lowest</span>' : '') + '</td>';
-      html += '<td><strong>' + formattedPrice + '</strong></td>';
-      html += '</tr>';
-    });
-
-    html += '</tbody></table>';
-
-    html += '<div style="text-align:center;margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
-    html += '<a href="https://www.smartprix.com/s/?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 Smartprix &rarr;</a>';
-    html += '<a href="https://buyhatke.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 BuyHatke &rarr;</a>';
-    html += '<a href="https://comparekarle.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 CompareKarle &rarr;</a>';
-    html += '</div>';
-
-    html += '<div style="margin-top:12px;padding:10px;border:2px solid #000;background:#fffdf5;font-size:11px;">';
-    html += '<strong>Source Key:</strong> ';
-    html += '<span class="compare-source-badge" style="background:#e9c46a;font-size:9px;margin:0 2px;">S</span> Smartprix &nbsp; ';
-    html += '<span class="compare-source-badge" style="background:#e76f51;font-size:9px;margin:0 2px;">BH</span> BuyHatke &nbsp; ';
-    html += '<span class="compare-source-badge" style="background:#4a90d9;font-size:9px;margin:0 2px;">CK</span> CompareKarle &nbsp; ';
-    html += '<span style="background:#52b788;padding:2px 6px;border:2px solid #000;font-size:9px;font-weight:bold;">🏆</span> Lowest Price';
-    html += '</div>';
-
-    el.innerHTML = html;
   }
 
   // ---- Quick Commerce ----
@@ -2604,6 +2568,12 @@
       title: "Travel",
       categories: [
         {
+          title: "Flights & Hotels",
+          injectTip: false,
+          injectFlightTools: true,
+          feeds: []
+        },
+        {
           title: "Travel & Tourism (India)",
           injectTip: false,
           feeds: [
@@ -2638,7 +2608,7 @@
             { name: "Travel With AK", language: "Hindi", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCMWfCqFo_WjIWV_zA6V0SMQ", isYoutube: true },
             { name: "Solo Travel India", language: "Hindi/English", url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCjGq4B8dPrj95kM_6hX9mpA", isYoutube: true }
           ]
-        }
+        },
       ]
     },
     {
@@ -2988,20 +2958,6 @@
           <div id="shop-tab-quickcommerce" class="shop-tab-panel" style="display:none;">
             <div class="shop-section-label">Quick Commerce Price Compare</div>
             <div style="font-size:11px;margin-bottom:8px;">Compare prices across Blinkit, Zepto, Instamart, BigBasket &amp; more</div>
-            <div class="shop-cat-chips" style="margin-bottom:10px;">
-              <button onclick="setQcCategory('tata salt')">&#x1F9C2; Salt</button>
-              <button onclick="setQcCategory('amul milk')">&#x1F95B; Milk</button>
-              <button onclick="setQcCategory('eggs')">&#x1F95A; Eggs</button>
-              <button onclick="setQcCategory('basmati rice')">&#x1F35A; Rice</button>
-              <button onclick="setQcCategory('atta wheat flour')">&#x1F33E; Atta</button>
-              <button onclick="setQcCategory('amul butter')">&#x1F9C8; Butter</button>
-              <button onclick="setQcCategory('toor dal')">&#x1FAD8; Dal</button>
-              <button onclick="setQcCategory('refined sunflower oil')">&#x1FAD9; Oil</button>
-              <button onclick="setQcCategory('onion')">&#x1F9C5; Onion</button>
-              <button onclick="setQcCategory('tomato')">&#x1F345; Tomato</button>
-              <button onclick="setQcCategory('paneer')">&#x1F9C0; Paneer</button>
-              <button onclick="setQcCategory('sugar')">&#x1F36C; Sugar</button>
-            </div>
             <input id="qc-input" type="text" placeholder="Type product name OR paste any product URL..." style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:4px;box-sizing:border-box;" onkeydown="if(event.key==='Enter') searchQuickCommerce()">
             <div style="font-family:monospace;font-size:10px;opacity:0.55;margin-bottom:8px;padding-left:2px;">💡 Paste a Blinkit / Amazon / Flipkart product URL — name &amp; size auto-extracted</div>
             <div style="display:flex;gap:8px;margin-bottom:10px;">
@@ -3112,6 +3068,54 @@
         sectionEl.appendChild(toolsSection);
       }
 
+      if (cat.injectFlightTools) {
+        const toolsSection = document.createElement('div');
+        toolsSection.className = 'feed-section';
+        toolsSection.innerHTML = `
+          <h2>&#9992;&#65039; Flights — Search &amp; Compare</h2>
+          <div class="flights-box">
+            <div class="fb-title">Find Nearest Airport &amp; Compare Flight Prices</div>
+            <label for="fl-spot">Step 1: Enter tourist spot / destination</label>
+            <div class="fb-row">
+              <input type="text" id="fl-spot" placeholder="e.g. Manali, Goa, Rishikesh, Jaipur..." onkeydown="if(event.key==='Enter') findNearestAirport()">
+              <button class="fb-btn" style="flex:0 0 auto;width:auto;padding:9px 18px;" onclick="findNearestAirport()">&#128269; Find Airport</button>
+            </div>
+            <div id="fl-airport-result"></div>
+            <div id="fl-search-form" style="display:none;">
+              <label for="fl-from">Step 2: Your departure city</label>
+              <input type="text" id="fl-from" placeholder="e.g. Mumbai, Delhi, Bangalore..." onkeydown="if(event.key==='Enter') searchFlights()">
+              <input type="hidden" id="fl-to-code">
+              <input type="hidden" id="fl-to-name">
+              <div class="fb-row">
+                <div style="flex:1;"><label for="fl-date">Departure Date</label><input type="date" id="fl-date"></div>
+                <div style="flex:1;"><label for="fl-return">Return Date <span style="font-weight:normal;opacity:0.6;">(skip for one-way)</span></label><input type="date" id="fl-return"></div>
+              </div>
+              <button class="fb-btn" style="background:#e07a5f;" onclick="searchFlights()">&#9992;&#65039; Search Flights</button>
+              <div id="fl-results"></div>
+            </div>
+          </div>
+          <h2>&#127976; Hotels — Search &amp; Compare Prices</h2>
+          <div class="flights-box">
+            <div class="fb-title">Find &amp; Compare Hotel Prices Across Portals</div>
+            <label for="ht-dest">Enter city / destination</label>
+            <input type="text" id="ht-dest" placeholder="e.g. Goa, Manali, Jaipur, Mumbai..." onkeydown="if(event.key==='Enter') searchHotels()">
+            <label for="ht-checkin">Check-in Date</label>
+            <input type="date" id="ht-checkin">
+            <label for="ht-checkout">Check-out Date</label>
+            <input type="date" id="ht-checkout">
+            <button class="fb-btn" style="background:#7ba0c4;" onclick="searchHotels()">&#127976; Search Hotels</button>
+            <div id="ht-results"></div>
+          </div>
+        `;
+        sectionEl.appendChild(toolsSection);
+        var flDate = document.getElementById('fl-date');
+        if (flDate) { var tomorrow = new Date(Date.now() + 86400000); flDate.value = tomorrow.toISOString().split('T')[0]; }
+        var htCi = document.getElementById('ht-checkin');
+        if (htCi) { var td = new Date(Date.now() + 86400000); htCi.value = td.toISOString().split('T')[0]; }
+        var htCo = document.getElementById('ht-checkout');
+        if (htCo) { var td2 = new Date(Date.now() + 86400000 * 2); htCo.value = td2.toISOString().split('T')[0]; }
+      }
+
       cat.feeds.forEach(feed => {
         const feedSection = document.createElement('div');
         feedSection.className = 'feed-section';
@@ -3141,7 +3145,6 @@
               return;
             }
 
-            // Filter out rss2json injected ad/promo items for YouTube feeds (they don't link to youtube.com)
             const validItems = feed.isYoutube
               ? data.items.filter(item => item.link && getYoutubeVideoId(item.link) && item.thumbnail && item.thumbnail.includes('ytimg.com'))
               : data.items;
