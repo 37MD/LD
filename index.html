@@ -582,6 +582,8 @@
   .btn-myntra   { background: #f04e98; color: #fff; }
   .btn-meesho   { background: #f43397; color: #fff; }
   .btn-nykaa    { background: #fc2779; color: #fff; }
+  .btn-instamart { background: #fc8019; color: #fff; }
+  .btn-dmart    { background: #d4145a; color: #fff; }
 
   .btn-compare  { background: #3d405b; color: #fff; }
   .btn-history  { background: #81b29a; color: #000; }
@@ -617,6 +619,81 @@
     font-weight: bold;
     margin: 14px 0 7px;
     opacity: 0.6;
+  }
+
+  /* ===== Price Comparison Styles ===== */
+  .compare-source-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border: 2px solid #000;
+    font-weight: bold;
+    font-size: 11px;
+    margin-bottom: 10px;
+  }
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13px;
+  }
+  .compare-table th, .compare-table td {
+    border: 2px solid #000;
+    padding: 10px 8px;
+    text-align: left;
+  }
+  .compare-table th {
+    background: #3d405b;
+    color: #fff !important;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+  }
+  .compare-table .lowest {
+    background: #b7e4c7;
+  }
+  .compare-table .lowest td:first-child {
+    background: #52b788;
+    color: #fff !important;
+    font-weight: bold;
+  }
+  .compare-table .source-row td {
+    font-weight: bold;
+    background: #e9c46a;
+  }
+  .compare-product-info {
+    border: 2px solid #000;
+    padding: 14px;
+    background: #fffdf5;
+    margin-bottom: 14px;
+  }
+  .compare-product-info .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .compare-product-info .value {
+    font-weight: bold;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+  .compare-similar {
+    border: 2px dashed #000;
+    padding: 14px;
+    margin-top: 16px;
+    background: #f5efe1;
+  }
+  .compare-similar h4 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+  }
+  .compare-error {
+    text-align: center;
+    padding: 30px 20px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
   }
 
 </style>
@@ -817,6 +894,8 @@
       flipkart: 'https://www.flipkart.com/search?q=' + encoded,
       meesho:   'https://www.meesho.com/search?q=' + encoded,
       nykaa:    'https://www.nykaa.com/search/result/?q=' + encoded,
+      instamart: 'https://www.swiggy.com/instamart/search?query=' + encoded,
+      dmart:    'https://www.dmart.in/search?q=' + encoded,
     };
     window.open(urls[portal] || urls.amazon, '_blank');
   }
@@ -840,6 +919,8 @@
       html += '<button onclick="searchWishItem(&quot;' + safeName + '&quot;,&quot;flipkart&quot;)" style="background:#2874f0;color:#fff;border:2px solid #000;padding:5px 10px;font-size:11px;font-weight:bold;cursor:pointer;">Flipkart</button>';
       html += '<button onclick="searchWishItem(&quot;' + safeName + '&quot;,&quot;meesho&quot;)" style="background:#f43397;color:#fff;border:2px solid #000;padding:5px 10px;font-size:11px;font-weight:bold;cursor:pointer;">Meesho</button>';
       html += '<button onclick="searchWishItem(&quot;' + safeName + '&quot;,&quot;nykaa&quot;)" style="background:#fc2779;color:#fff;border:2px solid #000;padding:5px 10px;font-size:11px;font-weight:bold;cursor:pointer;">Nykaa</button>';
+      html += '<button onclick="searchWishItem(&quot;' + safeName + '&quot;,&quot;instamart&quot;)" style="background:#fc8019;color:#fff;border:2px solid #000;padding:5px 10px;font-size:11px;font-weight:bold;cursor:pointer;">Instamart</button>';
+      html += '<button onclick="searchWishItem(&quot;' + safeName + '&quot;,&quot;dmart&quot;)" style="background:#d4145a;color:#fff;border:2px solid #000;padding:5px 10px;font-size:11px;font-weight:bold;cursor:pointer;">DMart</button>';
       html += '</div>';
       html += '<button onclick="removeWishItem(' + w.id + ')" style="background:#e0e1dd;border:2px solid #000;padding:4px 12px;font-size:11px;font-weight:bold;cursor:pointer;width:100%;">&#10003; Mark as Bought / Remove</button>';
       html += '</div>';
@@ -858,6 +939,8 @@
       myntra:    'https://www.myntra.com/' + enc,
       meesho:    'https://www.meesho.com/search?q=' + enc,
       nykaa:     'https://www.nykaa.com/search/result/?q=' + enc,
+      instamart: 'https://www.swiggy.com/instamart/search?query=' + enc,
+      dmart:     'https://www.dmart.in/search?q=' + enc,
 
       google:    'https://www.google.com/search?tbm=shop&q=' + enc,
     };
@@ -876,6 +959,288 @@
   function setShopCategory(cat) {
     document.getElementById('shop-q').value = cat;
     document.getElementById('shop-q').focus();
+  }
+
+  // ==========================================
+  // PRICE COMPARISON — Smart Link Compare
+  // ==========================================
+
+  function getLocationStr() {
+    var city = document.getElementById('loc-city') ? document.getElementById('loc-city').value.trim() || 'Thane' : 'Thane';
+    var pincode = document.getElementById('loc-pincode') ? document.getElementById('loc-pincode').value.trim() || '400607' : '400607';
+    var state = document.getElementById('loc-state') ? document.getElementById('loc-state').value : 'Maharashtra';
+    return city + ' ' + pincode + ' ' + state + ' India';
+  }
+
+  function saveLocationPrefs() {
+    var city = document.getElementById('loc-city');
+    var pincode = document.getElementById('loc-pincode');
+    var state = document.getElementById('loc-state');
+    if (city && pincode && state) {
+      var prefs = { city: city.value.trim() || 'Thane', pincode: pincode.value.trim() || '400607', state: state.value };
+      try { localStorage.setItem('khichdi_loc_prefs', JSON.stringify(prefs)); } catch(e) {}
+    }
+  }
+
+  function loadLocationPrefs() {
+    try {
+      var raw = localStorage.getItem('khichdi_loc_prefs');
+      if (!raw) return;
+      var prefs = JSON.parse(raw);
+      var city = document.getElementById('loc-city');
+      var pincode = document.getElementById('loc-pincode');
+      var state = document.getElementById('loc-state');
+      if (city && prefs.city) city.value = prefs.city;
+      if (pincode && prefs.pincode) pincode.value = prefs.pincode;
+      if (state && prefs.state) state.value = prefs.state;
+    } catch(e) {}
+  }
+
+  // Auto-save location on any change
+  document.addEventListener('input', function(e) {
+    if (e.target && (e.target.id === 'loc-city' || e.target.id === 'loc-pincode')) saveLocationPrefs();
+  });
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'loc-state') saveLocationPrefs();
+  });
+
+  // Load saved prefs after DOM ready
+  if (document.readyState === 'complete') { setTimeout(loadLocationPrefs, 300); }
+  else { document.addEventListener('DOMContentLoaded', function() { setTimeout(loadLocationPrefs, 300); }); }
+
+  function parseProductUrl(url) {
+    var info = { name: '', portal: '', portalLabel: '' };
+    if (url.includes('amazon.in')) { info.portal = 'amazon'; info.portalLabel = 'Amazon'; }
+    else if (url.includes('flipkart.com')) { info.portal = 'flipkart'; info.portalLabel = 'Flipkart'; }
+    else if (url.includes('myntra.com')) { info.portal = 'myntra'; info.portalLabel = 'Myntra'; }
+    else if (url.includes('meesho.com')) { info.portal = 'meesho'; info.portalLabel = 'Meesho'; }
+    else if (url.includes('nykaa.com')) { info.portal = 'nykaa'; info.portalLabel = 'Nykaa'; }
+    else if (url.includes('instamart') || url.includes('swiggy.com')) { info.portal = 'instamart'; info.portalLabel = 'Instamart'; }
+    else if (url.includes('dmart')) { info.portal = 'dmart'; info.portalLabel = 'DMart'; }
+    try {
+      var u = new URL(url);
+      var segments = u.pathname.split('/').filter(Boolean);
+      for (var i = segments.length - 1; i >= 0; i--) {
+        var s = segments[i].replace(/[_-]/g, ' ');
+        if (s.length > 5 && !/^[A-Z0-9]{6,}$/i.test(s.replace(/\s/g, '')) && !s.startsWith('itm') && !s.startsWith('dp') && !s.startsWith('pd')) {
+          info.name = s.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+          break;
+        }
+      }
+      if (!info.name && u.searchParams) {
+        var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search');
+        if (kw) info.name = kw;
+      }
+    } catch(e) {}
+    return info;
+  }
+
+  function compareProductPrice() {
+    var url = document.getElementById('compare-url-input').value.trim();
+    if (!url) { alert('Please paste a product link first.'); return; }
+    var info = parseProductUrl(url);
+    if (!info.name) { alert('Could not identify the product from this link. Please paste a product page URL.'); return; }
+    var query = info.name;
+    var encoded = encodeURIComponent(query);
+    var resultsEl = document.getElementById('compare-results');
+    resultsEl.innerHTML = '<p class="loading">🔍 Searching for best prices of "' + query + '" across portals...</p>';
+
+    var locStr = getLocationStr();
+    var gsUrl = 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(query + ' price India delivery ' + locStr) + '&hl=en-IN&gl=IN';
+    var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(gsUrl);
+
+    function tryProxy(url, fallback) {
+      fetch(url, { signal: AbortSignal.timeout(8000) })
+        .then(function(r) { return r.text(); })
+        .then(function(html) {
+          var prices = parseGoogleShoppingPrices(html, info.portal, query);
+          if (prices && prices.length > 0) {
+            renderPriceComparison(prices, info, query);
+          } else {
+            throw new Error('No prices found');
+          }
+        })
+        .catch(function() {
+          if (fallback) {
+            tryProxy(fallback, null);
+          } else {
+            renderPriceFallback(info, query);
+          }
+        });
+    }
+
+    var fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(gsUrl);
+    tryProxy(proxyUrl, fallbackUrl);
+  }
+
+  function parseGoogleShoppingPrices(html, sourcePortal, searchQuery) {
+    var results = [];
+    var seen = {};
+    var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/g;
+    var match;
+    var pricePositions = [];
+
+    while ((match = priceRegex.exec(html)) !== null) {
+      var price = parseFloat(match[1].replace(/,/g, ''));
+      if (price > 10 && price < 999999) {
+        var pos = match.index;
+        var start = Math.max(0, pos - 300);
+        var end = Math.min(html.length, pos + 150);
+        var context = html.substring(start, end).toLowerCase();
+
+        var merchant = '';
+        var merchants = [
+          { key: 'amazon', label: 'Amazon' }, { key: 'flipkart', label: 'Flipkart' },
+          { key: 'myntra', label: 'Myntra' }, { key: 'meesho', label: 'Meesho' },
+          { key: 'nykaa', label: 'Nykaa' }, { key: 'swiggy', label: 'Instamart' },
+          { key: 'instamart', label: 'Instamart' }, { key: 'dmart', label: 'DMart' },
+          { key: 'croma', label: 'Croma' }, { key: 'reliance', label: 'Reliance Digital' },
+          { key: 'tatacliq', label: 'Tata Cliq' }, { key: 'tatadigital', label: 'Tata Digital' },
+          { key: 'shopclues', label: 'ShopClues' }, { key: 'paytmmall', label: 'Paytm Mall' },
+          { key: 'snapdeal', label: 'Snapdeal' }, { key: 'vijay', label: 'Vijay Sales' },
+          { key: 'poorvika', label: 'Poorvika' }, { key: 'bajaj', label: 'Bajaj Mall' },
+          { key: 'sangeetha', label: 'Sangeetha' }, { key: 'grabon', label: 'GrabOn' }
+        ];
+        for (var i = 0; i < merchants.length; i++) {
+          if (context.indexOf(merchants[i].key) !== -1) {
+            merchant = merchants[i].label;
+            break;
+          }
+        }
+
+        if (merchant) {
+          var key = merchant + '_' + Math.round(price);
+          if (!seen[key]) {
+            seen[key] = true;
+            var nameMatch = context.match(/>([^<]{10,80})</g);
+            var prodName = searchQuery;
+            if (nameMatch) {
+              for (var j = 0; j < nameMatch.length; j++) {
+                var t = nameMatch[j].replace(/<[^>]*>/g, '').replace(/[<>]/g, '').trim();
+                if (t.length > 15 && !t.match(/^\d/) && !t.includes('shop') && !t.includes('search')) {
+                  prodName = t;
+                  break;
+                }
+              }
+            }
+            results.push({
+              merchant: merchant,
+              price: price,
+              isSource: merchant.toLowerCase() === sourcePortal || context.indexOf(sourcePortal) !== -1,
+              name: prodName,
+              url: 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(query + ' ' + merchant)
+            });
+          }
+        }
+      }
+    }
+
+    results.sort(function(a, b) { return a.price - b.price; });
+    return results;
+  }
+
+  function renderPriceComparison(prices, info, query) {
+    var el = document.getElementById('compare-results');
+    var encoded = encodeURIComponent(query);
+    var html = '';
+
+    html += '<div class="compare-product-info">';
+    html += '<div class="label">Parsed Product</div>';
+    html += '<div class="value">' + info.name + '</div>';
+    html += '<div class="label">Source Link</div>';
+    if (info.portalLabel) {
+      html += '<span class="compare-source-badge" style="background:#e9c46a;">📦 ' + info.portalLabel + '</span> ';
+    }
+    html += '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + getLocationStr() + '</span> ';
+    html += '</div>';
+
+    html += '<table class="compare-table">';
+    html += '<thead><tr><th>Portal</th><th>Price</th><th>Shop</th></tr></thead>';
+    html += '<tbody>';
+
+    var lowestPrice = prices.length > 0 ? prices[0].price : 0;
+    var hasLowest = false;
+
+    prices.forEach(function(p, idx) {
+      var isLowest = (idx === 0);
+      var rowClass = '';
+      if (isLowest) { rowClass = 'lowest'; hasLowest = true; }
+      else if (p.isSource) { rowClass = 'source-row'; }
+
+      var formattedPrice = '₹' + p.price.toLocaleString('en-IN');
+      var portalLabel = p.merchant;
+
+      html += '<tr class="' + rowClass + '">';
+      html += '<td>' + (isLowest ? '🏆 ' : '') + portalLabel + (isLowest ? ' <span style="font-size:10px;font-weight:normal;">Lowest</span>' : '') + '</td>';
+      html += '<td><strong>' + formattedPrice + '</strong></td>';
+      html += '<td><a href="' + p.url + '" target="_blank" style="font-family:monospace;font-size:11px;">🔗 View</a></td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+
+    // Similar products section (variations)
+    if (prices.length > 3) {
+      var similar = prices.slice(1);
+      html += '<div class="compare-similar">';
+      html += '<h4>📋 Similar Products & Variations</h4>';
+      html += '<table class="compare-table">';
+      html += '<thead><tr><th>Portal</th><th>Price</th><th>Shop</th></tr></thead>';
+      html += '<tbody>';
+      similar.forEach(function(p) {
+        html += '<tr>';
+        html += '<td>' + p.merchant + '</td>';
+        html += '<td>₹' + p.price.toLocaleString('en-IN') + '</td>';
+        html += '<td><a href="' + p.url + '" target="_blank" style="font-family:monospace;font-size:11px;">🔗 View</a></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      html += '</div>';
+    }
+
+    el.innerHTML = html;
+  }
+
+  function renderPriceFallback(info, query) {
+    var el = document.getElementById('compare-results');
+    var locStr = getLocationStr();
+    var locEncoded = encodeURIComponent(' ' + locStr);
+    var encoded = encodeURIComponent(query);
+    var portalUrls = {
+      amazon: 'https://www.amazon.in/s?k=' + encoded + locEncoded,
+      flipkart: 'https://www.flipkart.com/search?q=' + encoded + locEncoded,
+      myntra: 'https://www.myntra.com/' + encoded,
+      meesho: 'https://www.meesho.com/search?q=' + encoded + locEncoded,
+      nykaa: 'https://www.nykaa.com/search/result/?q=' + encoded + locEncoded,
+      instamart: 'https://www.swiggy.com/instamart/search?query=' + encoded + locEncoded,
+      dmart: 'https://www.dmart.in/search?q=' + encoded + locEncoded,
+      google: 'https://www.google.com/search?tbm=shop&q=' + encoded + locEncoded
+    };
+
+    var html = '<div class="compare-product-info">';
+    html += '<div class="label">Parsed Product</div>';
+    html += '<div class="value">' + info.name + '</div>';
+    if (info.portalLabel) {
+      html += '<span class="compare-source-badge" style="background:#e9c46a;">📦 ' + info.portalLabel + '</span> ';
+    }
+    html += '<span class="compare-source-badge" style="background:#81b29a;">📍 ' + getLocationStr() + '</span> ';
+    html += '</div>';
+
+    html += '<div class="compare-error">';
+    html += '<p>⚠️ Could not fetch live prices from Google Shopping.</p>';
+    html += '<p style="font-size:11px;margin-bottom:14px;">Search manually on each portal below (location: ' + getLocationStr() + '):</p>';
+    html += '</div>';
+
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">';
+    Object.keys(portalUrls).forEach(function(key) {
+      var labels = { amazon:'Amazon', flipkart:'Flipkart', myntra:'Myntra', meesho:'Meesho', nykaa:'Nykaa', instamart:'Instamart', dmart:'DMart', google:'Google Shop' };
+      var colors = { amazon:'#ff9900', flipkart:'#2874f0', myntra:'#f04e98', meesho:'#f43397', nykaa:'#fc2779', instamart:'#fc8019', dmart:'#d4145a', google:'#4285f4' };
+      var isSource = key === info.portal;
+      html += '<button onclick="window.open(\'' + portalUrls[key] + '\',\'_blank\')" style="padding:10px;border:2px solid #000;background:' + (isSource ? '#e9c46a' : colors[key]) + ';font-weight:bold;cursor:pointer;font-size:12px;' + (key === 'flipkart' || key === 'myntra' || key === 'meesho' || key === 'nykaa' || key === 'instamart' || key === 'dmart' ? 'color:#fff;' : '') + '">' + (isSource ? '📌 ' : '') + labels[key] + '</button>';
+    });
+    html += '</div>';
+
+    el.innerHTML = html;
   }
 
   // ---- Price History ----
@@ -897,11 +1262,11 @@
 
   // ---- Shopping tab switcher ----
   function shopTab(tab) {
-    ['shop-tab-search','shop-tab-wishlist','shop-tab-deals','shop-tab-cashback'].forEach(function(id) {
+    ['shop-tab-search','shop-tab-wishlist','shop-tab-deals','shop-tab-cashback','shop-tab-compare'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
-    ['stb-search','stb-wishlist','stb-deals','stb-cashback'].forEach(function(id) {
+    ['stb-search','stb-wishlist','stb-deals','stb-cashback','stb-compare'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) { el.style.background = '#e0e1dd'; el.style.borderBottom = '2px solid #000'; }
     });
@@ -1323,6 +1688,7 @@
             <button id="stb-wishlist"             onclick="shopTab('wishlist')">❤️ Wishlist</button>
             <button id="stb-deals"               onclick="shopTab('deals')">🔥 Sales Cal</button>
             <button id="stb-cashback"            onclick="shopTab('cashback')">💰 Cashback</button>
+            <button id="stb-compare"             onclick="shopTab('compare')">🔗 Compare</button>
           </div>
 
           <div id="shop-tab-search" class="shop-tab-panel">
@@ -1352,6 +1718,8 @@
               <button class="btn-myntra"   onclick="shopSearch('myntra')">👗 Myntra</button>
               <button class="btn-meesho"   onclick="shopSearch('meesho')">🛍 Meesho</button>
               <button class="btn-nykaa"    onclick="shopSearch('nykaa')">💄 Nykaa</button>
+              <button class="btn-instamart" onclick="shopSearch('instamart')">🛵 Instamart</button>
+              <button class="btn-dmart"    onclick="shopSearch('dmart')">🏪 DMart</button>
 
               <button class="btn-google"   onclick="shopSearch('google')">🔍 Google Shop</button>
             </div>
@@ -1451,6 +1819,50 @@
             <p style="font-size:12px;border:2px solid #000;padding:12px;background:#fffdf5;margin:0;">
               💡 <strong>Stack your savings:</strong> Use a cashback portal link + credit card offers + coupon code together for maximum discount on any purchase.
             </p>
+          </div>
+
+          <div id="shop-tab-compare" class="shop-tab-panel" style="display:none;">
+            <div class="shop-section-label">Paste any product link</div>
+            <input class="shop-input" id="compare-url-input" type="text" placeholder="e.g. https://www.amazon.in/... or flipkart.com/...">
+
+            <div class="shop-section-label" style="margin-top:6px;">📍 Delivery Location (prices vary by area)</div>
+            <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
+              <input id="loc-city" type="text" placeholder="City" value="Thane" style="flex:2;min-width:80px;padding:9px;border:2px solid #000;font-size:13px;background:#fff;">
+              <input id="loc-pincode" type="text" placeholder="Pincode" value="400607" style="flex:1;min-width:70px;padding:9px;border:2px solid #000;font-size:13px;background:#fff;">
+              <select id="loc-state" style="flex:2;min-width:90px;padding:9px;border:2px solid #000;font-size:13px;background:#fff;font-weight:bold;">
+                <option value="Andhra Pradesh">Andhra Pradesh</option>
+                <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                <option value="Assam">Assam</option>
+                <option value="Bihar">Bihar</option>
+                <option value="Chhattisgarh">Chhattisgarh</option>
+                <option value="Goa">Goa</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Haryana">Haryana</option>
+                <option value="Himachal Pradesh">Himachal Pradesh</option>
+                <option value="Jharkhand">Jharkhand</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Kerala">Kerala</option>
+                <option value="Madhya Pradesh">Madhya Pradesh</option>
+                <option value="Maharashtra" selected>Maharashtra</option>
+                <option value="Manipur">Manipur</option>
+                <option value="Meghalaya">Meghalaya</option>
+                <option value="Mizoram">Mizoram</option>
+                <option value="Nagaland">Nagaland</option>
+                <option value="Odisha">Odisha</option>
+                <option value="Punjab">Punjab</option>
+                <option value="Rajasthan">Rajasthan</option>
+                <option value="Sikkim">Sikkim</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Tripura">Tripura</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Uttarakhand">Uttarakhand</option>
+                <option value="West Bengal">West Bengal</option>
+              </select>
+            </div>
+
+            <button onclick="compareProductPrice()" style="width:100%;padding:12px;border:2px solid #000;background:#e07a5f;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:10px;">🔍 Find Best Price Across Portals</button>
+            <div id="compare-results"></div>
           </div>
         `;
         sectionEl.appendChild(toolsSection);
