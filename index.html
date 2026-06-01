@@ -1021,17 +1021,24 @@
       var u = new URL(url);
       var segments = u.pathname.split('/').filter(Boolean);
       for (var i = segments.length - 1; i >= 0; i--) {
-        var s = segments[i].replace(/[_-]/g, ' ');
-        if (s.length > 5 && !/^[A-Z0-9]{6,}$/i.test(s.replace(/\s/g, '')) && !s.startsWith('itm') && !s.startsWith('dp') && !s.startsWith('pd')) {
-          info.name = s.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
-          break;
-        }
+        var raw = segments[i];
+        var s = raw.replace(/[_-]/g, ' ');
+        if (s.trim().length < 4) continue;
+        if (/^(dp|itm|pd|pr|pid|ref|p|gp|product|detail|sku|in|en|amp)\b/i.test(raw)) continue;
+        if (/^\d{6,}$/.test(raw)) continue;
+        info.name = s.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+        break;
+      }
+      if (!info.name) {
+        var all = segments.map(function(x) { return x.replace(/[_-]/g, ' '); }).filter(function(x) { return x.length > 4 && !/^\d+$/.test(x); });
+        if (all.length) info.name = all[all.length - 1].replace(/\b\w/g, function(c) { return c.toUpperCase(); });
       }
       if (!info.name && u.searchParams) {
-        var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search');
+        var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search') || u.searchParams.get('url');
         if (kw) info.name = kw;
       }
     } catch(e) {}
+    if (!info.name) info.name = 'product';
     return info;
   }
 
