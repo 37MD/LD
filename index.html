@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>खिचडी 1H1 — Recipes · Stories · Videos</title>
+<title>खिचडी 1L — Recipes · Stories · Videos</title>
 <meta name="theme-color" content="#ece0c4">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="खिचडी 1H1">
-<meta name="application-name" content="खिचडी 1H1">
+<meta name="apple-mobile-web-app-title" content="खिचडी 1L">
+<meta name="application-name" content="खिचडी 1L">
 <meta name="description" content="Marathi recipes, stories, videos and lifestyle — ad-free reader">
 <link rel="manifest" href="#" id="pwa-manifest-link">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='28' fill='%23ece0c4'/%3E%3Cpath d='M30 110 L110 110 C115 110 118 135 105 135 L45 135 C30 135 25 110 30 110 Z' fill='%231a1a1a'/%3E%3Cpath d='M105 115 Q145 110 165 105 A5 5 0 0 1 165 115 Q145 120 105 125 Z' fill='%231a1a1a'/%3E%3Cpath d='M60 90 C45 75 75 60 55 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M80 90 C65 75 95 60 75 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M100 90 C85 75 115 60 95 45' fill='none' stroke='%231a1a1a' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
@@ -721,7 +721,7 @@
       </select>
       <button class="reset-small-btn" id="reset-btn">&#8634; Reset</button>
     </div>
-    <div class="masthead-tagline">खिचडी 1H1</div>
+    <div class="masthead-tagline">खिचडी 1L</div>
     <div class="masthead-title">खिचडी<span class="pan-icon"><svg viewBox="0 0 192 192"><path d="M30 110 L110 110 C115 110 118 135 105 135 L45 135 C30 135 25 110 30 110 Z" fill="#1a1a1a"/><path d="M105 115 Q145 110 165 105 A5 5 0 0 1 165 115 Q145 120 105 125 Z" fill="#1a1a1a"/><path d="M60 90 C45 75 75 60 55 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/><path d="M80 90 C65 75 95 60 75 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/><path d="M100 90 C85 75 115 60 95 45" fill="none" stroke="#1a1a1a" stroke-width="6" stroke-linecap="round"/></svg></span></div>
     <div class="masthead-tagline">Recipes · Stories · Videos · YouTube</div>
   </div>
@@ -1092,6 +1092,26 @@
     return variations.slice(0, 4);
   }
 
+  function showUrlPreview() {
+    var el = document.getElementById('compare-url-preview');
+    var url = document.getElementById('compare-url-input').value.trim();
+    if (!url || !/^https?:\/\//.test(url)) { el.style.display = 'none'; return; }
+    var info = parseProductUrl(url);
+    var query = info.name || url.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s); }).pop() || '';
+    if (!query) { el.style.display = 'none'; return; }
+    var qty = extractQty(query);
+    var displayName = qty ? query.replace(new RegExp(escapeRegExp(qty), 'i'), '').trim() : query;
+    el.style.display = 'block';
+    el.innerHTML = '<div style="font-family:monospace;font-size:9px;opacity:0.6;margin-bottom:4px;">PARSED FROM URL</div>' +
+      '<strong>' + displayName.substring(0, 60) + '</strong>' +
+      (qty ? ' <span style="background:#e9c46a;padding:2px 6px;border:1px solid #000;font-weight:bold;font-size:11px;">' + qty + '</span>' : '') +
+      '<div style="margin-top:6px;font-size:11px;opacity:0.7;">Will search: ' + displayName.substring(0, 50) + (qty ? ' (' + qty + ')' : '') + ' &mdash; <em>click Find Best Price</em></div>';
+  }
+
+  function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
   function compareProductPrice() {
     var url = document.getElementById('compare-url-input').value.trim();
     if (!url) { alert('Please paste a product link first.'); return; }
@@ -1157,7 +1177,7 @@
 
   function resolveShortUrlTitle(url, callback) {
     var jinaUrl = 'https://r.jina.ai/' + encodeURIComponent(url);
-    fetch(jinaUrl, { signal: AbortSignal.timeout(10000) })
+    fetch(jinaUrl, { signal: AbortSignal.timeout(6000) })
       .then(function(r) { return r.text(); })
       .then(function(text) {
         var m = text.match(/<title[^>]*>([^<]+)<\/title>/i);
@@ -1484,19 +1504,32 @@
   // ---- Quick Commerce ----
   var QC_PLATFORMS = [
     { id: 'blinkit', name: 'Blinkit', url: 'https://blinkit.com/s/?q=' },
-    { id: 'zepto', name: 'Zepto', url: 'https://www.zepto.com/search?q=' },
+    { id: 'zepto', name: 'Zepto', url: 'https://www.zepto.com/search?query=' },
     { id: 'instamart', name: 'Instamart', url: 'https://www.swiggy.com/instamart/search?query=' },
     { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/ps/?q=' }
   ];
 
   function searchQuickCommerce() {
-    var input = document.getElementById('qc-input').value.trim();
-    if (!input) { alert('Enter a product name first.'); return; }
+    var raw = document.getElementById('qc-input').value.trim();
+    if (!raw) { alert('Enter a product name first.'); return; }
     // Extract product name if a URL was pasted
-    if (/^https?:\/\//.test(input)) {
-      var parsed = parseProductUrl(input);
-      if (parsed.name) input = parsed.name;
+    if (/^https?:\/\//.test(raw)) {
+      var parsed = parseProductUrl(raw);
+      if (parsed.name) { runQcSearch(parsed.name); return; }
+      // Short URL — resolve async
+      if (raw.match(/amzn\.in|fkrt\.?/i)) {
+        var el = document.getElementById('qc-results');
+        el.innerHTML = '<p class="loading"><span class="spinner">⟳</span> Resolving product name from short URL...</p>';
+        resolveShortUrlTitle(raw, function(title) {
+          runQcSearch(title || raw);
+        });
+        return;
+      }
     }
+    runQcSearch(raw);
+  }
+
+  function runQcSearch(input) {
     var el = document.getElementById('qc-results');
     var locStr = getLocationStr();
     el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading"><span class="spinner">⟳</span> Searching Blinkit, Zepto, Instamart & BigBasket...</p>';
@@ -1505,15 +1538,22 @@
     var allResults = [];
     var completed = 0;
     var blinkitDone = false;
+    var bestName = '';  // best product name from Blinkit for cross-platform links
 
     function collect(platform, results) {
       if (results && results.length > 0) {
         results.forEach(function(r) { r.platform = platform; });
         allResults = allResults.concat(results);
+        // Save first (lowest price) Blinkit result's name+qty for other platform links
+        if (platform === 'blinkit' && results.length > 0 && !bestName) {
+          var r0 = results[0];
+          bestName = r0.name + (r0.qty ? ' ' + r0.qty : '');
+        }
       } else {
         var pf = QC_PLATFORMS.filter(function(p) { return p.id === platform; })[0];
         if (pf) {
-          allResults.push({ merchant: pf.name, price: null, mrp: null, name: null, url: pf.url + encodeURIComponent(input), platform: platform, linkOnly: true });
+          var linkQ = bestName || input;
+          allResults.push({ merchant: pf.name, price: null, mrp: null, name: null, url: pf.url + encodeURIComponent(linkQ), platform: platform, linkOnly: true });
         }
       }
       if (platform === 'blinkit') blinkitDone = true;
@@ -1706,14 +1746,13 @@
     var html = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + query + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span><span style="font-family:monospace;font-size:10px;margin-left:8px;opacity:0.6;">' + elapsed + '</span></div>';
 
     html += '<table class="compare-table">';
-    html += '<thead><tr><th>Product Name</th><th>Qty / Size</th><th>Store</th><th>Price</th><th>MRP</th></tr></thead>';
+    html += '<thead><tr><th>Product Name</th><th>Qty / Size</th><th>Store</th><th>Price</th></tr></thead>';
     html += '<tbody>';
 
     results.forEach(function(r) {
       if (r.price !== null) {
         var isLowest = hasPrices && r.price === results.filter(function(x) { return x.price !== null; })[0].price;
         var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
-        var formattedMrp = r.mrp ? '₹' + r.mrp.toLocaleString('en-IN') : '—';
         var discount = (r.mrp && r.mrp > r.price) ? '<span style="color:#2a9d8f;font-size:10px;"> ' + Math.round((1 - r.price / r.mrp) * 100) + '% off</span>' : '';
         var qty = r.qty || extractQty(r.name || '');
 
@@ -1722,14 +1761,13 @@
         html += '<td style="font-size:12px;text-align:center;white-space:nowrap;">' + (qty || '—') + '</td>';
         html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + '</td>';
         html += '<td><strong>' + formattedPrice + '</strong> ' + discount + '</td>';
-        html += '<td style="text-decoration:line-through;color:#999;">' + formattedMrp + '</td>';
         html += '</tr>';
       } else {
         html += '<tr style="opacity:0.6;">';
         html += '<td style="font-size:12px;">' + query + '</td>';
         html += '<td style="font-size:12px;text-align:center;">—</td>';
         html += '<td>' + r.merchant + '</td>';
-        html += '<td colspan="2"><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;">🔗 Search on ' + r.merchant + ' &rarr;</a></td>';
+        html += '<td><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;">🔗 Search on ' + r.merchant + ' &rarr;</a></td>';
         html += '</tr>';
       }
     });
@@ -1738,7 +1776,7 @@
 
     html += '<div style="text-align:center;margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">';
     html += '<a href="https://blinkit.com/s/?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 Blinkit &rarr;</a>';
-    html += '<a href="https://www.zepto.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 Zepto &rarr;</a>';
+    html += '<a href="https://www.zepto.com/search?query=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 Zepto &rarr;</a>';
     html += '<a href="https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 Instamart &rarr;</a>';
     html += '<a href="https://www.bigbasket.com/ps/?q=' + encodeURIComponent(query) + '" target="_blank" style="font-family:monospace;font-size:11px;font-weight:bold;">🔗 BigBasket &rarr;</a>';
     html += '</div>';
@@ -1765,11 +1803,11 @@
 
   // ---- Shopping tab switcher ----
   function shopTab(tab) {
-    ['shop-tab-search','shop-tab-wishlist','shop-tab-deals','shop-tab-cashback','shop-tab-compare','shop-tab-quickcommerce'].forEach(function(id) {
+    ['shop-tab-search','shop-tab-wishlist','shop-tab-deals','shop-tab-cashback','shop-tab-compare','shop-tab-quickcommerce','shop-tab-compareqcom'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
-    ['stb-search','stb-wishlist','stb-deals','stb-cashback','stb-compare','stb-quickcommerce'].forEach(function(id) {
+    ['stb-search','stb-wishlist','stb-deals','stb-cashback','stb-compare','stb-quickcommerce','stb-compareqcom'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) { el.style.background = '#e0e1dd'; el.style.borderBottom = '2px solid #000'; }
     });
@@ -1777,6 +1815,77 @@
     if (show) show.style.display = 'block';
     var activeBtn = document.getElementById('stb-' + tab);
     if (activeBtn) { activeBtn.style.background = '#e9c46a'; activeBtn.style.borderBottom = '3px solid #000'; }
+  }
+
+  // ---- QuickCompare.in ----
+  function qcomExtractName(val) {
+    if (!/^https?:\/\//.test(val)) return val;
+    if (val.match(/amzn\.in|fkrt\.?/i)) return null;
+    var info = parseProductUrl(val);
+    if (info.name && info.name.length > 5) return info.name;
+    // Fallback: pick longest readable segment (skip ASINs / product IDs)
+    var segs = val.replace(/https?:\/\//, '').split(/[/?&]/).filter(function(s) { return s.length > 5 && !s.includes('.') && !/^\d+$/.test(s) && !/^[A-Za-z0-9]{8,15}$/.test(s); });
+    segs.sort(function(a, b) { return b.length - a.length; });
+    return segs.length > 0 ? segs[0] : null;
+  }
+
+  function previewQcomUrl() {
+    var val = document.getElementById('qcom-input').value.trim();
+    var preview = document.getElementById('qcom-preview');
+    var btn = document.getElementById('qcom-open-btn');
+    if (!val) { preview.style.display = 'none'; btn.disabled = true; btn.style.opacity = '0.4'; return; }
+
+    var isShortUrl = val.match(/amzn\.in|fkrt\.?/i);
+    var name = qcomExtractName(val);
+    if (name === null) {
+      preview.style.display = 'block';
+      preview.innerHTML = '<div style="font-family:monospace;font-size:9px;opacity:0.6;margin-bottom:4px;">' + (isShortUrl ? 'SHORT URL DETECTED' : 'URL PASTED') + '</div>' +
+        '<p style="font-size:11px;">' + (isShortUrl ? 'Resolving product title...' : 'Could not auto-detect product name from URL.') + '</p>' +
+        '<p style="font-size:10px;opacity:0.6;">Click Open to ' + (isShortUrl ? 'resolve and search.' : 'search using the URL.') + '</p>';
+      btn.disabled = false; btn.style.opacity = '1';
+      return;
+    }
+
+    var qty = extractQty(name);
+    var displayName = qty ? name.replace(new RegExp(escapeRegExp(qty), 'i'), '').trim() : name;
+    preview.style.display = 'block';
+    preview.innerHTML = '<div style="font-family:monospace;font-size:9px;opacity:0.6;margin-bottom:4px;">' + (/^https?:\/\//.test(val) ? 'PARSED FROM URL' : 'PRODUCT NAME') + '</div>' +
+      '<strong>' + displayName.substring(0, 60) + '</strong>' +
+      (qty ? ' <span style="background:#e9c46a;padding:2px 6px;border:1px solid #000;font-weight:bold;font-size:11px;">' + qty + '</span>' : '') +
+      '<div style="margin-top:6px;font-size:11px;opacity:0.7;">Will search on QuickCompare.in: ' + displayName.substring(0, 50) + (qty ? ' (' + qty + ')' : '') + '</div>';
+    btn.disabled = false; btn.style.opacity = '1';
+  }
+
+  function openQuickCompare() {
+    var val = document.getElementById('qcom-input').value.trim();
+    if (!val) return;
+    var el = document.getElementById('qcom-results');
+
+    var isShortUrl = val.match(/amzn\.in|fkrt\.?/i);
+    if (isShortUrl) {
+      el.innerHTML = '<p style="padding:10px;">Short URL detected. Resolving product name...</p>';
+      resolveShortUrlTitle(val, function(title) {
+        var q = title;
+        if (!q || q.length < 5) {
+          el.innerHTML = '<p style="padding:10px;">Could not auto-resolve this short URL (Amazon blocks it).</p><p style="font-size:12px;">Please open the link in a browser tab, copy the product name, and paste it here.</p>';
+          return;
+        }
+        el.innerHTML = '<p style="padding:10px;">Open QuickCompare.in and search for:</p><p style="font-size:14px;padding:8px;border:2px solid #000;background:#f4f1de;font-weight:bold;">🔍 ' + q + '</p><p style="font-size:10px;">Requires <strong>location access</strong> on QuickCompare.in.</p>';
+        window.open('https://quickcompare.in/', '_blank');
+      });
+      return;
+    }
+
+    var name = qcomExtractName(val);
+    if (!name) {
+      el.innerHTML = '<p>Could not extract product name. Try typing it manually.</p>';
+      return;
+    }
+    var qty = extractQty(name);
+    var displayName = qty ? name.replace(new RegExp(escapeRegExp(qty), 'i'), '').trim() : name;
+    var q = displayName + (qty ? ' ' + qty : '');
+    el.innerHTML = '<p style="padding:10px;">Opening QuickCompare.in...</p><p style="font-size:13px;padding:6px;border:2px solid #000;background:#f4f1de;">🔍 <strong>' + q + '</strong></p><p style="font-size:10px;">Search term shown above — paste it into QuickCompare.in if not auto-filled. Requires <strong>location access</strong>.</p>';
+    window.open('https://quickcompare.in/', '_blank');
   }
 
   // ==========================================
@@ -2193,6 +2302,7 @@
             <button id="stb-cashback"            onclick="shopTab('cashback')">💰 Cashback</button>
             <button id="stb-compare"             onclick="shopTab('compare')">🔗 Compare</button>
             <button id="stb-quickcommerce"       onclick="shopTab('quickcommerce')">🛵 Quick Comm</button>
+            <button id="stb-compareqcom"         onclick="shopTab('compareqcom')">⚡ Compare QCom</button>
           </div>
 
           <div id="shop-tab-search" class="shop-tab-panel">
@@ -2311,7 +2421,8 @@
 
           <div id="shop-tab-compare" class="shop-tab-panel" style="display:none;">
             <div class="shop-section-label">Paste any product link</div>
-            <input class="shop-input" id="compare-url-input" type="text" placeholder="e.g. https://www.amazon.in/... or flipkart.com/...">
+            <input class="shop-input" id="compare-url-input" type="text" placeholder="e.g. https://www.amazon.in/... or flipkart.com/..." oninput="showUrlPreview()">
+            <div id="compare-url-preview" style="display:none;border:2px solid #000;padding:10px;margin-bottom:10px;background:#f4f1de;font-size:12px;"></div>
 
             <div class="shop-section-label" style="margin-top:6px;">📍 Delivery Location (prices vary by area)</div>
             <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;">
@@ -2360,6 +2471,18 @@
             <input id="qc-input" type="text" placeholder="e.g. tata salt, amul milk, eggs..." style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;">
             <button onclick="searchQuickCommerce()" style="width:100%;padding:12px;border:2px solid #000;background:#4a90d9;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:10px;">🛵 Search Quick Commerce</button>
             <div id="qc-results"></div>
+          </div>
+
+          <!-- COMPARE QCOM TAB -->
+          <div id="shop-tab-compareqcom" class="shop-tab-panel" style="display:none;">
+            <div class="shop-section-label">QuickCompare.in</div>
+            <div style="font-size:11px;margin-bottom:10px;">Step 1: Paste product link or enter product name</div>
+            <input id="qcom-input" type="text" placeholder="Paste URL or type product name..." oninput="previewQcomUrl()" style="width:100%;padding:10px;border:2px solid #000;font-family:monospace;font-size:13px;margin-bottom:8px;box-sizing:border-box;">
+            <div id="qcom-preview" style="display:none;border:2px solid #000;padding:10px;margin-bottom:10px;background:#f4f1de;font-size:12px;"></div>
+            <button id="qcom-open-btn" disabled onclick="openQuickCompare()" style="width:100%;padding:12px;border:2px solid #000;background:#e07a5f;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:10px;opacity:0.4;">⚡ Open on QuickCompare.in</button>
+            <div id="qcom-results" style="font-family:monospace;font-size:11px;text-align:center;padding:10px;border:2px dashed #000;background:#fffdf5;">
+              Paste a URL above to auto-detect product &amp; size, then click Open.
+            </div>
           </div>
         `;
         sectionEl.appendChild(toolsSection);
@@ -3006,8 +3129,8 @@ self.addEventListener('fetch', e => { const u = e.request.url; if (e.request.met
 <script>
 (function() {
   const manifest = {
-    name: "खिचडी 1H1 — Recipes · Stories · Videos",
-    short_name: "खिचडी 1H1",
+    name: "खिचडी 1L — Recipes · Stories · Videos",
+    short_name: "खिचडी 1L",
     description: "Marathi recipes, stories, videos and lifestyle — ad-free reader",
     start_url: "./",
     display: "standalone",
@@ -3042,7 +3165,7 @@ self.addEventListener('fetch', e => { const u = e.request.url; if (e.request.met
     setTimeout(function() {
       var badge = document.createElement('div');
       badge.id = 'pwa-badge';
-      badge.innerHTML = '<span style="cursor:pointer;position:fixed;bottom:20px;left:16px;z-index:1300;background:#1a1a1a;color:#ece0c4;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 16px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;">⬇ Install खिचडी 1H1</span>';
+      badge.innerHTML = '<span style="cursor:pointer;position:fixed;bottom:20px;left:16px;z-index:1300;background:#1a1a1a;color:#ece0c4;font-family:\'IBM Plex Mono\',monospace;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;padding:8px 16px;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:8px;">⬇ Install खिचडी 1L</span>';
       badge.onclick = function(e) {
         if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt = null; badge.remove(); }); }
       };
