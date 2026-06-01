@@ -115,7 +115,7 @@
     margin-top: 35px;
     margin-bottom: 20px;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 0.54em;
     font-weight: bold;
     text-transform: uppercase;
   }
@@ -134,7 +134,7 @@
     border: 2px solid #000000;
     border-radius: 20px;
     text-align: center;
-    font-size: 1.1em;
+    font-size: 0.72em;
     text-transform: uppercase;
     letter-spacing: 1px;
     cursor: pointer;
@@ -517,7 +517,7 @@
     border-bottom: 2px solid #000;
     background: #e0e1dd;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
+    font-size: 16px;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
@@ -613,7 +613,7 @@
   .sale-cal-card .sc-desc { font-size: 11px; margin-top: 5px; opacity: 0.8; }
   .shop-section-label {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
+    font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
     font-weight: bold;
@@ -1433,27 +1433,60 @@
   }
 
   // ---- Quick Commerce ----
+  var QC_PLATFORMS = [
+    { id: 'blinkit', name: 'Blinkit', url: 'https://blinkit.com/s/?q=' },
+    { id: 'zepto', name: 'Zepto', url: 'https://www.zepto.com/search?q=' },
+    { id: 'instamart', name: 'Instamart', url: 'https://www.swiggy.com/instamart/search?query=' },
+    { id: 'bigbasket', name: 'BigBasket', url: 'https://www.bigbasket.com/ps/?q=' }
+  ];
+
   function searchQuickCommerce() {
     var input = document.getElementById('qc-input').value.trim();
     if (!input) { alert('Enter a product name first.'); return; }
     var el = document.getElementById('qc-results');
     var locStr = getLocationStr();
-    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching Blinkit for prices...</p>';
+    el.innerHTML = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + input + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div><p class="loading">⟳ Searching Blinkit, Zepto, Instamart & BigBasket...</p>';
 
     var startTime = Date.now();
-    searchBlinkit(input, function(results) {
-      renderQcResults(results, input, startTime);
-    });
+    var allResults = [];
+    var completed = 0;
+
+    function collect(platform, results) {
+      if (results && results.length > 0) {
+        results.forEach(function(r) { r.platform = platform; });
+        allResults = allResults.concat(results);
+      } else {
+        // No results — add a link-only placeholder row
+        var pf = QC_PLATFORMS.filter(function(p) { return p.id === platform; })[0];
+        if (pf) {
+          allResults.push({ merchant: pf.name, price: null, mrp: null, name: null, url: pf.url + encodeURIComponent(input), platform: platform, linkOnly: true });
+        }
+      }
+      completed++;
+      if (completed >= QC_PLATFORMS.length) {
+        allResults.sort(function(a, b) {
+          if (a.price === null && b.price === null) return 0;
+          if (a.price === null) return 1;
+          if (b.price === null) return -1;
+          return a.price - b.price;
+        });
+        renderQcResults(allResults, input, startTime);
+      }
+    }
+
+    searchBlinkit(input, function(r) { collect('blinkit', r); });
+    searchZepto(input, function(r) { collect('zepto', r); });
+    searchInstamart(input, function(r) { collect('instamart', r); });
+    searchBigBasket(input, function(r) { collect('bigbasket', r); });
   }
 
   function searchBlinkit(query, callback) {
     var jinaUrl = 'https://r.jina.ai/https://blinkit.com/s/?q=' + encodeURIComponent(query);
-    fetch(jinaUrl, { signal: AbortSignal.timeout(15000) })
+    fetch(jinaUrl, { signal: AbortSignal.timeout(12000) })
       .then(function(r) { return r.text(); })
       .then(function(text) {
         if (text.length < 200) throw Error('empty');
-        var results = parseBlinkitText(text, query);
-        callback(results);
+        callback(parseBlinkitText(text, query));
       })
       .catch(function() { callback([]); });
   }
@@ -1472,7 +1505,6 @@
       var price = parseFloat(m[1].replace(/,/g, ''));
       if (price < 1 || price > 99999) continue;
 
-      // Get product name: scan backwards up to 3 lines for a non-price, non-weight line
       var name = '';
       for (var j = Math.max(0, i - 3); j <= i; j++) {
         var candidate = lines[j].trim();
@@ -1483,7 +1515,6 @@
       }
       if (!name) name = searchQuery;
 
-      // Check if there's an MRP (original price) on this or next line
       var mrp = null;
       for (var k = i; k <= Math.min(i + 2, lines.length - 1); k++) {
         var mrpMatch = lines[k].match(/[₹]\s*([0-9,]+(?:\.\d{2})?)/);
@@ -1510,24 +1541,102 @@
     return results;
   }
 
+  function searchZepto(query, callback) {
+    var jinaUrl = 'https://r.jina.ai/https://www.zepto.com/search?query=' + encodeURIComponent(query);
+    fetch(jinaUrl, { signal: AbortSignal.timeout(10000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = searchQuery;
+          for (var j = Math.max(0, i - 2); j < i; j++) {
+            var c = lines[j].trim();
+            if (c && c.length > 5 && c.length < 80 && !c.match(/[₹]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var key = 'Zepto_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'Zepto', price: price, mrp: null, name: name, url: 'https://www.zepto.com/search?query=' + encodeURIComponent(query) });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
+  }
+
+  function searchInstamart(query, callback) {
+    var jinaUrl = 'https://r.jina.ai/https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(query);
+    fetch(jinaUrl, { signal: AbortSignal.timeout(10000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = searchQuery;
+          for (var j = Math.max(0, i - 2); j < i; j++) {
+            var c = lines[j].trim();
+            if (c && c.length > 5 && c.length < 80 && !c.match(/[₹]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var key = 'Instamart_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'Instamart', price: price, mrp: null, name: name, url: 'https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(query) });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
+  }
+
+  function searchBigBasket(query, callback) {
+    var jinaUrl = 'https://r.jina.ai/https://www.bigbasket.com/ps/?q=' + encodeURIComponent(query);
+    fetch(jinaUrl, { signal: AbortSignal.timeout(10000) })
+      .then(function(r) { return r.text(); })
+      .then(function(text) {
+        if (text.length < 300) throw Error('empty');
+        var results = [], seen = {};
+        var lines = text.split('\n');
+        var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/;
+        for (var i = 0; i < lines.length; i++) {
+          var m = lines[i].match(priceRegex);
+          if (!m) continue;
+          var price = parseFloat(m[1].replace(/,/g, ''));
+          if (price < 1 || price > 99999) continue;
+          var name = searchQuery;
+          for (var j = Math.max(0, i - 2); j < i; j++) {
+            var c = lines[j].trim();
+            if (c && c.length > 5 && c.length < 80 && !c.match(/[₹]/) && !c.match(/^\d/)) { name = c; break; }
+          }
+          var key = 'BigBasket_' + Math.round(price);
+          if (seen[key]) continue;
+          seen[key] = true;
+          results.push({ merchant: 'BigBasket', price: price, mrp: null, name: name, url: 'https://www.bigbasket.com/ps/?q=' + encodeURIComponent(query) });
+        }
+        if (results.length === 0) throw Error('no prices');
+        callback(results);
+      })
+      .catch(function() { callback([]); });
+  }
+
   function renderQcResults(results, query, startTime) {
     var el = document.getElementById('qc-results');
     var locStr = getLocationStr();
     var elapsed = startTime ? ' (' + ((Date.now() - startTime) / 1000).toFixed(1) + 's)' : '';
 
-    if (results.length === 0) {
-      var html = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + query + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span></div>';
-      html += '<div class="compare-error"><p>⚠️ No prices found on Blinkit for <strong>' + query + '</strong>' + elapsed + '</p>';
-      html += '<p style="font-size:11px;">Try searching directly on quick commerce platforms:</p>';
-      html += '<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px;">';
-      html += '<a href="https://blinkit.com/s/?q=' + encodeURIComponent(query) + '" target="_blank" style="padding:8px 14px;border:2px solid #000;background:#f4f1de;font-weight:bold;font-size:12px;text-decoration:none;">🛵 Blinkit</a>';
-      html += '<a href="https://www.zepto.com/search?q=' + encodeURIComponent(query) + '" target="_blank" style="padding:8px 14px;border:2px solid #000;background:#f4f1de;font-weight:bold;font-size:12px;text-decoration:none;">⚡ Zepto</a>';
-      html += '<a href="https://www.swiggy.com/instamart/search?query=' + encodeURIComponent(query) + '" target="_blank" style="padding:8px 14px;border:2px solid #000;background:#f4f1de;font-weight:bold;font-size:12px;text-decoration:none;">🛵 Instamart</a>';
-      html += '<a href="https://www.bigbasket.com/ps/?q=' + encodeURIComponent(query) + '" target="_blank" style="padding:8px 14px;border:2px solid #000;background:#f4f1de;font-weight:bold;font-size:12px;text-decoration:none;">🛒 BigBasket</a>';
-      html += '</div></div>';
-      el.innerHTML = html;
-      return;
-    }
+    var hasPrices = results.some(function(r) { return r.price !== null; });
 
     var html = '<div class="compare-product-info"><div class="label">🔍 Product</div><div class="value">' + query + '</div><span class="compare-source-badge" style="background:#81b29a;">📍 ' + locStr + '</span><span style="font-family:monospace;font-size:10px;margin-left:8px;opacity:0.6;">' + elapsed + '</span></div>';
 
@@ -1535,18 +1644,26 @@
     html += '<thead><tr><th>Product Name</th><th>Store</th><th>Price</th><th>MRP</th></tr></thead>';
     html += '<tbody>';
 
-    results.forEach(function(r, idx) {
-      var isLowest = (idx === 0);
-      var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
-      var formattedMrp = r.mrp ? '₹' + r.mrp.toLocaleString('en-IN') : '—';
-      var discount = (r.mrp && r.mrp > r.price) ? '<span style="color:#2a9d8f;font-size:10px;"> ' + Math.round((1 - r.price / r.mrp) * 100) + '% off</span>' : '';
+    results.forEach(function(r) {
+      if (r.price !== null) {
+        var isLowest = hasPrices && r.price === results.filter(function(x) { return x.price !== null; })[0].price;
+        var formattedPrice = '₹' + r.price.toLocaleString('en-IN');
+        var formattedMrp = r.mrp ? '₹' + r.mrp.toLocaleString('en-IN') : '—';
+        var discount = (r.mrp && r.mrp > r.price) ? '<span style="color:#2a9d8f;font-size:10px;"> ' + Math.round((1 - r.price / r.mrp) * 100) + '% off</span>' : '';
 
-      html += '<tr class="' + (isLowest ? 'lowest' : '') + '">';
-      html += '<td style="font-size:12px;">' + r.name + '</td>';
-      html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + '</td>';
-      html += '<td><strong>' + formattedPrice + '</strong> ' + discount + '</td>';
-      html += '<td style="text-decoration:line-through;color:#999;">' + formattedMrp + '</td>';
-      html += '</tr>';
+        html += '<tr class="' + (isLowest ? 'lowest' : '') + '">';
+        html += '<td style="font-size:12px;">' + r.name + '</td>';
+        html += '<td>' + (isLowest ? '🏆 ' : '') + r.merchant + '</td>';
+        html += '<td><strong>' + formattedPrice + '</strong> ' + discount + '</td>';
+        html += '<td style="text-decoration:line-through;color:#999;">' + formattedMrp + '</td>';
+        html += '</tr>';
+      } else {
+        html += '<tr style="opacity:0.6;">';
+        html += '<td style="font-size:12px;">' + query + '</td>';
+        html += '<td>' + r.merchant + '</td>';
+        html += '<td colspan="2"><a href="' + r.url + '" target="_blank" style="font-weight:bold;font-size:12px;">🔗 Search on ' + r.merchant + ' &rarr;</a></td>';
+        html += '</tr>';
+      }
     });
 
     html += '</tbody></table>';
