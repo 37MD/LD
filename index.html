@@ -1020,25 +1020,42 @@
     try {
       var u = new URL(url);
       var segments = u.pathname.split('/').filter(Boolean);
-      for (var i = segments.length - 1; i >= 0; i--) {
+
+      function isJunk(str) {
+        if (str.length < 4) return true;
+        if (/^(dp|itm|pd|pr|pid|ref|p|gp|product|detail|sku|in|en|amp|images|img|media|uploads|static|assets|css|js|fonts|common|index|default)\b/i.test(str)) return true;
+        if (/^\d{6,}$/.test(str)) return true;
+        // Random token: mixed case + digits, 5-15 chars, no separators
+        if (/^[A-Za-z0-9]{5,15}$/.test(str) && /[A-Z]/.test(str) && /[a-z]/.test(str) && /[0-9]/.test(str)) {
+          // Check it's not a common readable word
+          if (!/[aeiou]{2}/i.test(str) && str.length < 12) return true;
+        }
+        return false;
+      }
+
+      // Prefer segments with hyphens (word-based product names)
+      var best = '';
+      for (var i = 0; i < segments.length; i++) {
         var raw = segments[i];
+        if (isJunk(raw)) continue;
         var s = raw.replace(/[_-]/g, ' ');
-        if (s.trim().length < 4) continue;
-        if (/^(dp|itm|pd|pr|pid|ref|p|gp|product|detail|sku|in|en|amp)\b/i.test(raw)) continue;
-        if (/^\d{6,}$/.test(raw)) continue;
-        info.name = s.replace(/\b\w/g, function(c) { return c.toUpperCase(); });
-        break;
+        if (s.length > best.length) {
+          // Boost segments that had hyphens (readable product names)
+          if (raw.indexOf('-') !== -1) s = s + ' ';
+          best = s;
+        }
       }
-      if (!info.name) {
-        var all = segments.map(function(x) { return x.replace(/[_-]/g, ' '); }).filter(function(x) { return x.length > 4 && !/^\d+$/.test(x); });
-        if (all.length) info.name = all[all.length - 1].replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+
+      if (best) {
+        info.name = best.replace(/\b\w/g, function(c) { return c.toUpperCase(); }).trim();
       }
+
       if (!info.name && u.searchParams) {
         var kw = u.searchParams.get('q') || u.searchParams.get('keywords') || u.searchParams.get('query') || u.searchParams.get('search') || u.searchParams.get('url');
         if (kw) info.name = kw;
       }
     } catch(e) {}
-    if (!info.name) info.name = 'product';
+    if (!info.name || info.name.length < 3) info.name = 'product';
     return info;
   }
 
@@ -1053,13 +1070,37 @@
     resultsEl.innerHTML = '<p class="loading">🔍 Searching for best prices of "' + query + '" across portals...</p>';
 
     var locStr = getLocationStr();
-    var gsUrl = 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(query + ' price India delivery ' + locStr) + '&hl=en-IN&gl=IN';
-    var proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(gsUrl);
+    var searchQ = encodeURIComponent(query + ' price India ' + locStr);
+    var gsUrl = 'https://www.google.com/search?tbm=shop&q=' + searchQ + '&hl=en-IN&gl=IN';
 
-    function tryProxy(url, fallback) {
-      fetch(url, { signal: AbortSignal.timeout(8000) })
+    var proxies = [
+      'https://corsproxy.io/?' + encodeURIComponent(gsUrl),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(gsUrl),
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(gsUrl)
+    ];
+
+    function tryProxies(index) {
+      if (index >= proxies.length) {
+        // Last resort: try regular Google search (sometimes has price panels)
+        var gsUrl2 = 'https://www.google.com/search?q=' + searchQ + '&hl=en-IN&gl=IN';
+        var altProxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(gsUrl2);
+        fetch(altProxy, { signal: AbortSignal.timeout(8000) })
+          .then(function(r) { return r.text(); })
+          .then(function(html) {
+            if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) throw Error('Blocked');
+            var prices = parseGoogleShoppingPrices(html, info.portal, query);
+            if (prices && prices.length > 0) { renderPriceComparison(prices, info, query); }
+            else { throw Error('No prices'); }
+          })
+          .catch(function() { renderPriceFallback(info, query); });
+        return;
+      }
+      fetch(proxies[index], { signal: AbortSignal.timeout(8000) })
         .then(function(r) { return r.text(); })
         .then(function(html) {
+          if (html.includes('captcha') || html.includes('unusual traffic') || html.length < 500) {
+            throw new Error('Blocked or empty');
+          }
           var prices = parseGoogleShoppingPrices(html, info.portal, query);
           if (prices && prices.length > 0) {
             renderPriceComparison(prices, info, query);
@@ -1068,77 +1109,92 @@
           }
         })
         .catch(function() {
-          if (fallback) {
-            tryProxy(fallback, null);
-          } else {
-            renderPriceFallback(info, query);
-          }
+          tryProxies(index + 1);
         });
     }
 
-    var fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(gsUrl);
-    tryProxy(proxyUrl, fallbackUrl);
+    tryProxies(0);
   }
 
   function parseGoogleShoppingPrices(html, sourcePortal, searchQuery) {
     var results = [];
     var seen = {};
-    var priceRegex = /[₹]\s*([0-9,]+(?:\.\d{2})?)/g;
+
+    // Match ₹1,234, Rs. 1,234, INR 1,234, or just 1,234 near price indicators
+    var priceRegex = /(?:[₹]\s*|Rs\.?\s*|INR\s*|&#8377;\s*|&#x20B9;\s*)([0-9,]+(?:\.\d{2})?)/gi;
+    // Also catch bare prices near known price context words
+    var barePriceRegex = /\b([0-9,]+(?:\.\d{2})?)\b/g;
     var match;
     var pricePositions = [];
 
-    while ((match = priceRegex.exec(html)) !== null) {
-      var price = parseFloat(match[1].replace(/,/g, ''));
-      if (price > 10 && price < 999999) {
-        var pos = match.index;
-        var start = Math.max(0, pos - 300);
-        var end = Math.min(html.length, pos + 150);
-        var context = html.substring(start, end).toLowerCase();
+    function extractMerchant(ctx) {
+      var list = [
+        { key: 'amazon', label: 'Amazon' }, { key: 'flipkart', label: 'Flipkart' },
+        { key: 'myntra', label: 'Myntra' }, { key: 'meesho', label: 'Meesho' },
+        { key: 'nykaa', label: 'Nykaa' }, { key: 'swiggy', label: 'Instamart' },
+        { key: 'instamart', label: 'Instamart' }, { key: 'dmart', label: 'DMart' },
+        { key: 'croma', label: 'Croma' }, { key: 'reliance', label: 'Reliance Digital' },
+        { key: 'tatacliq', label: 'Tata Cliq' }, { key: 'tatadigital', label: 'Tata Digital' },
+        { key: 'shopclues', label: 'ShopClues' }, { key: 'paytmmall', label: 'Paytm Mall' },
+        { key: 'snapdeal', label: 'Snapdeal' }, { key: 'vijay', label: 'Vijay Sales' },
+        { key: 'poorvika', label: 'Poorvika' }, { key: 'bajaj', label: 'Bajaj Mall' },
+        { key: 'sangeetha', label: 'Sangeetha' }, { key: 'grabon', label: 'GrabOn' }
+      ];
+      for (var i = 0; i < list.length; i++) {
+        if (ctx.indexOf(list[i].key) !== -1) return list[i].label;
+      }
+      return '';
+    }
 
-        var merchant = '';
-        var merchants = [
-          { key: 'amazon', label: 'Amazon' }, { key: 'flipkart', label: 'Flipkart' },
-          { key: 'myntra', label: 'Myntra' }, { key: 'meesho', label: 'Meesho' },
-          { key: 'nykaa', label: 'Nykaa' }, { key: 'swiggy', label: 'Instamart' },
-          { key: 'instamart', label: 'Instamart' }, { key: 'dmart', label: 'DMart' },
-          { key: 'croma', label: 'Croma' }, { key: 'reliance', label: 'Reliance Digital' },
-          { key: 'tatacliq', label: 'Tata Cliq' }, { key: 'tatadigital', label: 'Tata Digital' },
-          { key: 'shopclues', label: 'ShopClues' }, { key: 'paytmmall', label: 'Paytm Mall' },
-          { key: 'snapdeal', label: 'Snapdeal' }, { key: 'vijay', label: 'Vijay Sales' },
-          { key: 'poorvika', label: 'Poorvika' }, { key: 'bajaj', label: 'Bajaj Mall' },
-          { key: 'sangeetha', label: 'Sangeetha' }, { key: 'grabon', label: 'GrabOn' }
-        ];
-        for (var i = 0; i < merchants.length; i++) {
-          if (context.indexOf(merchants[i].key) !== -1) {
-            merchant = merchants[i].label;
+    function addResult(price, ctx, isSourcePortal) {
+      if (price < 10 || price > 999999) return;
+      var merchant = extractMerchant(ctx);
+      if (!merchant) return;
+      var key = merchant + '_' + Math.round(price);
+      if (seen[key]) return;
+      seen[key] = true;
+      var nameMatch = ctx.match(/>([^<]{10,80})</g);
+      var prodName = searchQuery;
+      if (nameMatch) {
+        for (var j = 0; j < nameMatch.length; j++) {
+          var t = nameMatch[j].replace(/<[^>]*>/g, '').replace(/[<>]/g, '').trim();
+          if (t.length > 15 && !t.match(/^\d/) && t.indexOf('shop') === -1 && t.indexOf('search') === -1) {
+            prodName = t;
             break;
           }
         }
+      }
+      var isSource = isSourcePortal || ctx.indexOf(sourcePortal) !== -1;
+      results.push({
+        merchant: merchant, price: price, isSource: isSource, name: prodName,
+        url: 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(searchQuery + ' ' + merchant)
+      });
+    }
 
-        if (merchant) {
-          var key = merchant + '_' + Math.round(price);
-          if (!seen[key]) {
-            seen[key] = true;
-            var nameMatch = context.match(/>([^<]{10,80})</g);
-            var prodName = searchQuery;
-            if (nameMatch) {
-              for (var j = 0; j < nameMatch.length; j++) {
-                var t = nameMatch[j].replace(/<[^>]*>/g, '').replace(/[<>]/g, '').trim();
-                if (t.length > 15 && !t.match(/^\d/) && !t.includes('shop') && !t.includes('search')) {
-                  prodName = t;
-                  break;
-                }
-              }
-            }
-            results.push({
-              merchant: merchant,
-              price: price,
-              isSource: merchant.toLowerCase() === sourcePortal || context.indexOf(sourcePortal) !== -1,
-              name: prodName,
-              url: 'https://www.google.com/search?tbm=shop&q=' + encodeURIComponent(query + ' ' + merchant)
-            });
-          }
-        }
+    // Pass 1: Find prices with currency symbols (₹, Rs., INR, etc.)
+    while ((match = priceRegex.exec(html)) !== null) {
+      var price = parseFloat(match[1].replace(/,/g, ''));
+      var pos = match.index;
+      var start = Math.max(0, pos - 300);
+      var end = Math.min(html.length, pos + 150);
+      var ctx = html.substring(start, end).toLowerCase();
+      addResult(price, ctx, false);
+    }
+
+    // Pass 2: Look for bare prices near merchant names (Google Shopping structure)
+    // Find merchant names first, then look for nearby prices
+    var merchantRegex = /(amazon|flipkart|myntra|meesho|nykaa|instamart|dmart|croma|reliance|tatacliq|shopclues|snapdeal)[^<]{0,100}/gi;
+    while ((match = merchantRegex.exec(html)) !== null) {
+      var mPos = match.index;
+      var mEnd = Math.min(html.length, mPos + 200);
+      var mCtx = html.substring(mPos, mEnd);
+      // Find price near this merchant mention
+      var pMatch = mCtx.match(/(?:[₹]\s*|Rs\.?\s*|INR\s*|&#8377;\s*)([0-9,]+(?:\.\d{2})?)/i);
+      if (pMatch) {
+        var p = parseFloat(pMatch[1].replace(/,/g, ''));
+        var ctxStart = Math.max(0, mPos - 100);
+        var ctxEnd = Math.min(html.length, mPos + 250);
+        addResult(p, html.substring(ctxStart, ctxEnd).toLowerCase(), false);
       }
     }
 
